@@ -42,6 +42,8 @@ export function HeroSection() {
           // Fallback to alternative endpoint
           response = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/hero-slides/all-slides" || "http://localhost:5000/hero-slides/all-slides")
           console.log("Fallback API Response:", response.data)
+          console.log("hello world !");
+          
         }
         
         if (response.data && response.data.length > 0) {
