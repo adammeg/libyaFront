@@ -1,8 +1,3 @@
-/**
- * Formats an image path to ensure it's properly accessible
- * @param imagePath The original image path from the API
- * @returns Properly formatted image URL
- */
 export function formatImagePath(path: string): string {
   if (!path) {
     return '/placeholder.svg';
@@ -33,4 +28,4 @@ export function formatImagePath(path: string): string {
   
   // Default case: assume it's a relative path from the uploads directory
   return `${apiBaseUrl}/uploads/${formattedPath}`;
-} 
+}

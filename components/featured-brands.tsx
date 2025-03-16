@@ -15,16 +15,20 @@ interface Brand {
 export function FeaturedBrands() {
   const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchBrands = async () => {
       try {
         setLoading(true)
-        const response = await axios.get("http://localhost:5000/brands/all-brands")
-        // Get up to 5 brands to feature
-        setBrands(response.data.slice(0, 5))
-      } catch (error) {
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/brands/all-brands`)
+        console.log("Brands data:", response.data)
+        setBrands(response.data)
+        setError(null)
+      } catch (error: any) {
         console.error("Error fetching brands:", error)
+        setError(error.message || "Failed to load brands" as any)
       } finally {
         setLoading(false)
       }

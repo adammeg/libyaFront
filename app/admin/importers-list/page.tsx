@@ -54,7 +54,8 @@ export default function ImportersListPage() {
     const fetchImporters = async () => {
       try {
         setLoading(true)
-        const response = await axios.get("http://localhost:5000/importers/all-importers")
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/importers/all-importers`)
         setImporters(response.data)
         setFilteredImporters(response.data)
       } catch (error) {

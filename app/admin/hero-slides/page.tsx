@@ -38,7 +38,7 @@ export default function HeroSlidesPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  
+
   // Form state
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -52,7 +52,8 @@ export default function HeroSlidesPage() {
   const fetchSlides = async () => {
     try {
       setLoading(true)
-      const response = await axios.get("http://localhost:5000/hero-slides/all-slides")
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await axios.get(`${apiBaseUrl}/hero-slides/all-slides`)
       setSlides(response.data)
     } catch (error) {
       console.error("Error fetching hero slides:", error)
@@ -75,7 +76,7 @@ export default function HeroSlidesPage() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setImage(file)
-      
+
       // Create preview
       const reader = new FileReader()
       reader.onload = (e) => {
@@ -124,7 +125,7 @@ export default function HeroSlidesPage() {
 
     try {
       setIsSubmitting(true)
-      
+
       const formData = new FormData()
       formData.append("title", title)
       formData.append("description", description)
@@ -133,7 +134,7 @@ export default function HeroSlidesPage() {
       formData.append("isActive", isActive.toString())
       formData.append("order", slides.length.toString())
       if (image) formData.append("image", image)
-      
+
       console.log("Submitting form data:", {
         title,
         description,
@@ -144,19 +145,20 @@ export default function HeroSlidesPage() {
         imageFileName: image?.name
       })
       
-      const response = await axios.post("http://localhost:5000/hero-slides/create", formData, {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await axios.post(`${apiBaseUrl}/hero-slides/create`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
-      
+
       console.log("Server response:", response.data)
-      
+
       toast({
         title: "Success",
         description: "Hero slide created successfully.",
       })
-      
+
       resetForm()
       setIsCreateDialogOpen(false)
       fetchSlides()
@@ -185,7 +187,7 @@ export default function HeroSlidesPage() {
 
     try {
       setIsSubmitting(true)
-      
+
       const formData = new FormData()
       formData.append("title", title)
       formData.append("description", description)
@@ -193,18 +195,19 @@ export default function HeroSlidesPage() {
       formData.append("buttonLink", buttonLink)
       formData.append("isActive", isActive.toString())
       if (image) formData.append("image", image)
-      
-      await axios.put(`http://localhost:5000/hero-slides/${selectedSlide._id}`, formData, {
+
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      await axios.put(`${apiBaseUrl}/hero-slides/${selectedSlide._id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
-      
+
       toast({
         title: "Success",
         description: "Hero slide updated successfully.",
       })
-      
+
       resetForm()
       setIsEditDialogOpen(false)
       fetchSlides()
@@ -226,14 +229,14 @@ export default function HeroSlidesPage() {
 
     try {
       setIsSubmitting(true)
-      
-      await axios.delete(`http://localhost:5000/hero-slides/${selectedSlide._id}`)
-      
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      await axios.delete(`${apiBaseUrl}/hero-slides/${selectedSlide._id}`)
+
       toast({
         title: "Success",
         description: "Hero slide deleted successfully.",
       })
-      
+
       setIsDeleteDialogOpen(false)
       fetchSlides()
     } catch (error) {
@@ -253,18 +256,19 @@ export default function HeroSlidesPage() {
     try {
       const formData = new FormData()
       formData.append("isActive", (!slide.isActive).toString())
-      
-      await axios.put(`http://localhost:5000/hero-slides/${slide._id}`, formData, {
+
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      await axios.put(`${apiBaseUrl}/hero-slides/${slide._id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
-      
+
       toast({
         title: "Success",
         description: `Slide ${slide.isActive ? "hidden" : "shown"} successfully.`,
       })
-      
+
       fetchSlides()
     } catch (error) {
       console.error("Error toggling slide visibility:", error)
@@ -280,7 +284,7 @@ export default function HeroSlidesPage() {
   const changeOrder = async (slide: HeroSlide, direction: 'up' | 'down') => {
     const currentIndex = slides.findIndex(s => s._id === slide._id)
     if (
-      (direction === 'up' && currentIndex === 0) || 
+      (direction === 'up' && currentIndex === 0) ||
       (direction === 'down' && currentIndex === slides.length - 1)
     ) {
       return
@@ -293,14 +297,15 @@ export default function HeroSlidesPage() {
       // Update current slide order
       const formData1 = new FormData()
       formData1.append("order", targetSlide.order.toString())
-      await axios.put(`http://localhost:5000/hero-slides/${slide._id}`, formData1, {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      await axios.put(`${apiBaseUrl}/hero-slides/${slide._id}`, formData1, {
         headers: { "Content-Type": "multipart/form-data" },
       })
 
       // Update target slide order
       const formData2 = new FormData()
       formData2.append("order", slide.order.toString())
-      await axios.put(`http://localhost:5000/hero-slides/${targetSlide._id}`, formData2, {
+      await axios.put(`${apiBaseUrl}/hero-slides/${targetSlide._id}`, formData2, {
         headers: { "Content-Type": "multipart/form-data" },
       })
 
@@ -308,7 +313,7 @@ export default function HeroSlidesPage() {
         title: "Success",
         description: "Slide order updated successfully.",
       })
-      
+
       fetchSlides()
     } catch (error) {
       console.error("Error changing slide order:", error)
@@ -322,7 +327,7 @@ export default function HeroSlidesPage() {
 
   const DebugInfo = ({ data }: { data: any }) => {
     const [showDebug, setShowDebug] = useState(false)
-    
+
     if (!showDebug) {
       return (
         <div className="mt-8 text-center">
@@ -332,7 +337,7 @@ export default function HeroSlidesPage() {
         </div>
       )
     }
-    
+
     return (
       <div className="mt-8 p-4 border rounded-lg bg-muted/20">
         <div className="flex justify-between items-center mb-2">
@@ -351,18 +356,18 @@ export default function HeroSlidesPage() {
   const ImagePathTester = () => {
     const [imagePath, setImagePath] = useState("");
     const [formattedPath, setFormattedPath] = useState("");
-    
+
     const testPath = () => {
       if (!imagePath) return;
       setFormattedPath(formatImagePath(imagePath));
     };
-    
+
     return (
       <div className="mt-8 p-4 border rounded-lg">
         <h3 className="font-semibold mb-2">Image Path Tester</h3>
         <div className="flex gap-2 mb-4">
-          <Input 
-            value={imagePath} 
+          <Input
+            value={imagePath}
             onChange={(e) => setImagePath(e.target.value)}
             placeholder="Enter image path to test"
             className="flex-1"
@@ -373,9 +378,9 @@ export default function HeroSlidesPage() {
           <div className="space-y-2">
             <p className="text-sm">Formatted path: <code className="bg-muted p-1 rounded">{formattedPath}</code></p>
             <div className="h-40 border rounded overflow-hidden">
-              <img 
-                src={formattedPath} 
-                alt="Test image" 
+              <img
+                src={formattedPath}
+                alt="Test image"
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   console.error(`Failed to load test image: ${formattedPath}`);
@@ -402,7 +407,7 @@ export default function HeroSlidesPage() {
             Add New Slide
           </Button>
         </div>
-        
+
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -427,8 +432,8 @@ export default function HeroSlidesPage() {
               <Card key={slide._id} className={`overflow-hidden ${!slide.isActive ? 'opacity-60' : ''}`}>
                 <div className="flex flex-col md:flex-row">
                   <div className="w-full md:w-1/3 h-48 md:h-auto relative">
-                    <img 
-                      src={formatImagePath(slide.image)} 
+                    <img
+                      src={formatImagePath(slide.image)}
                       alt={slide.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -452,16 +457,16 @@ export default function HeroSlidesPage() {
                         </div>
                       </div>
                       <div className="flex space-x-2">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="icon"
                           onClick={() => changeOrder(slide, 'up')}
                           disabled={slides.indexOf(slide) === 0}
                         >
                           <ArrowUp className="h-4 w-4" />
                         </Button>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="icon"
                           onClick={() => changeOrder(slide, 'down')}
                           disabled={slides.indexOf(slide) === slides.length - 1}
@@ -471,8 +476,8 @@ export default function HeroSlidesPage() {
                       </div>
                     </div>
                     <div className="flex items-center justify-end mt-4 space-x-2">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => toggleActive(slide)}
                       >
@@ -488,16 +493,16 @@ export default function HeroSlidesPage() {
                           </>
                         )}
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => prepareEditForm(slide)}
                       >
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit
                       </Button>
-                      <Button 
-                        variant="destructive" 
+                      <Button
+                        variant="destructive"
                         size="sm"
                         onClick={() => {
                           setSelectedSlide(slide)

@@ -49,14 +49,14 @@ export default function SearchPage() {
       try {
         setLoading(true)
         setError(null)
-
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
         // Check if we have any search parameters
         const hasSearchParams = type || brand || model
-        
+
         if (!hasSearchParams) {
           // If no search parameters, fetch all cars
           console.log("No search parameters provided, fetching all cars")
-          const response = await axios.get("http://localhost:5000/cars/all-cars")
+          const response = await axios.get(`${apiBaseUrl}/cars/all-cars`)
           setCars(response.data)
           return
         }
@@ -68,8 +68,8 @@ export default function SearchPage() {
         if (model && model !== "all-models") params.model = model
 
         console.log("Fetching search results with params:", params)
-        
-        const response = await axios.get("http://localhost:5000/cars/search", { params })
+
+        const response = await axios.get(`${apiBaseUrl}/cars/search`, { params })
         console.log("Search response:", response.data)
         setCars(response.data)
       } catch (error: any) {
@@ -94,109 +94,109 @@ export default function SearchPage() {
 
   return (
     <>
-    <SiteHeader />
-    <div className="container py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Search Results</h1>
-        <div className="flex flex-wrap gap-2">
-          {type && (
-            <div className="bg-muted px-3 py-1 rounded-full text-sm">
-              Type: {type}
-            </div>
-          )}
-          {brand && (
-            <div className="bg-muted px-3 py-1 rounded-full text-sm">
-              Brand: {brand}
-            </div>
-          )}
-          {model && (
-            <div className="bg-muted px-3 py-1 rounded-full text-sm">
-              Model: {model}
-            </div>
-          )}
+      <SiteHeader />
+      <div className="container py-12">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Search Results</h1>
+          <div className="flex flex-wrap gap-2">
+            {type && (
+              <div className="bg-muted px-3 py-1 rounded-full text-sm">
+                Type: {type}
+              </div>
+            )}
+            {brand && (
+              <div className="bg-muted px-3 py-1 rounded-full text-sm">
+                Brand: {brand}
+              </div>
+            )}
+            {model && (
+              <div className="bg-muted px-3 py-1 rounded-full text-sm">
+                Model: {model}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : error ? (
-        <div className="text-center p-8 bg-red-50 rounded-lg">
-          <p className="text-red-600">{error}</p>
-          <Button className="mt-4" onClick={() => window.history.back()}>
-            Go Back
-          </Button>
-        </div>
-      ) : cars.length === 0 ? (
-        <div className="text-center p-8 bg-muted rounded-lg">
-          <h2 className="text-xl font-semibold mb-2">No vehicles found</h2>
-          <p className="text-muted-foreground mb-4">
-            Try adjusting your search criteria to find more results.
-          </p>
-          <Button onClick={() => window.history.back()}>
-            Back to Search
-          </Button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cars.map((car) => (
-            <Link href={`/vehicles/${car._id}`} key={car._id}>
-              <Card className="overflow-hidden h-full hover:shadow-md transition-shadow">
-                <div className="relative aspect-video">
-                  {car.photos && car.photos.length > 0 ? (
-                    <div className="relative h-full w-full">
-                      <img
-                        src={formatImagePath(car.photos[0])}
-                        alt={car.model}
-                        className="h-full w-full object-cover"
-                        onError={(e) => {
-                          // Hide the image on error
-                          (e.target as HTMLImageElement).style.display = 'none';
-                          // Show the fallback div
-                          const parent = (e.target as HTMLImageElement).parentElement;
-                          if (parent) {
-                            const fallback = parent.querySelector('.fallback-icon');
-                            if (fallback) fallback.classList.remove('hidden');
-                          }
-                        }}
-                      />
-                      <div className="fallback-icon hidden absolute inset-0 bg-muted flex items-center justify-center">
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : error ? (
+          <div className="text-center p-8 bg-red-50 rounded-lg">
+            <p className="text-red-600">{error}</p>
+            <Button className="mt-4" onClick={() => window.history.back()}>
+              Go Back
+            </Button>
+          </div>
+        ) : cars.length === 0 ? (
+          <div className="text-center p-8 bg-muted rounded-lg">
+            <h2 className="text-xl font-semibold mb-2">No vehicles found</h2>
+            <p className="text-muted-foreground mb-4">
+              Try adjusting your search criteria to find more results.
+            </p>
+            <Button onClick={() => window.history.back()}>
+              Back to Search
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {cars.map((car) => (
+              <Link href={`/vehicles/${car._id}`} key={car._id}>
+                <Card className="overflow-hidden h-full hover:shadow-md transition-shadow">
+                  <div className="relative aspect-video">
+                    {car.photos && car.photos.length > 0 ? (
+                      <div className="relative h-full w-full">
+                        <img
+                          src={formatImagePath(car.photos[0])}
+                          alt={car.model}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            // Hide the image on error
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            // Show the fallback div
+                            const parent = (e.target as HTMLImageElement).parentElement;
+                            if (parent) {
+                              const fallback = parent.querySelector('.fallback-icon');
+                              if (fallback) fallback.classList.remove('hidden');
+                            }
+                          }}
+                        />
+                        <div className="fallback-icon hidden absolute inset-0 bg-muted flex items-center justify-center">
+                          <Car className="h-12 w-12 text-muted-foreground" />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="h-full w-full bg-muted flex items-center justify-center">
                         <Car className="h-12 w-12 text-muted-foreground" />
                       </div>
-                    </div>
-                  ) : (
-                    <div className="h-full w-full bg-muted flex items-center justify-center">
-                      <Car className="h-12 w-12 text-muted-foreground" />
-                    </div>
-                  )}
-                </div>
-                <CardContent className="p-4">
-                  <h3 className="text-lg font-semibold mb-1">{car.model}</h3>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-sm text-muted-foreground">
-                      {Array.isArray(car.brands) &&
-                        car.brands.map((brand: any, index: number) => (
-                          <span key={index}>
-                            {typeof brand === "object" ? brand.name : "Unknown"}
-                            {index < car.brands.length - 1 ? ", " : ""}
-                          </span>
-                        ))}
-                    </div>
-                    <div className="text-primary font-semibold">
-                      {formatPrice(car.price)}
-                    </div>
+                    )}
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {car.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+                  <CardContent className="p-4">
+                    <h3 className="text-lg font-semibold mb-1">{car.model}</h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm text-muted-foreground">
+                        {Array.isArray(car.brands) &&
+                          car.brands.map((brand: any, index: number) => (
+                            <span key={index}>
+                              {typeof brand === "object" ? brand.name : "Unknown"}
+                              {index < car.brands.length - 1 ? ", " : ""}
+                            </span>
+                          ))}
+                      </div>
+                      <div className="text-primary font-semibold">
+                        {formatPrice(car.price)}
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {car.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </>
   )
 } 

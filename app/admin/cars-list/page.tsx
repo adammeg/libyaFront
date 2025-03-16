@@ -71,7 +71,8 @@ export default function CarsListPage() {
     const fetchCars = async () => {
       try {
         setLoading(true)
-        const response = await axios.get("http://localhost:5000/cars/all-cars")
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/cars/all-cars`)
         setCars(response.data)
         setFilteredCars(response.data)
       } catch (error) {
@@ -127,7 +128,8 @@ export default function CarsListPage() {
 
     try {
       setIsDeleting(true)
-      await axios.delete(`http://localhost:5000/cars/${carToDelete._id}`)
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      await axios.delete(`${apiBaseUrl}/cars/${carToDelete._id}`)
       
       // Update the cars list
       setCars(prevCars => prevCars.filter(car => car._id !== carToDelete._id))

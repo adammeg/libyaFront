@@ -61,7 +61,8 @@ export default function VehicleDetailPage() {
         setLoading(true)
         setError(null)
         
-        const response = await axios.get(`http://localhost:5000/cars/${params?.id}`)
+          const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/cars/${params?.id}`)
         setCar(response.data)
       } catch (error: any) {
         console.error("Error fetching car details:", error)
@@ -87,7 +88,8 @@ export default function VehicleDetailPage() {
       
       try {
         setLoadingSimilar(true);
-        const response = await axios.get(`http://localhost:5000/cars/${params?.id}/similar`);
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/cars/${params?.id}/similar`);
         setSimilarCars(response.data);
       } catch (error) {
         console.error("Error fetching similar cars:", error);

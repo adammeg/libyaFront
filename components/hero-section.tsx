@@ -33,6 +33,10 @@ export function HeroSection() {
     const fetchSlides = async () => {
       try {
         setIsLoading(true)
+        
+        // Log environment variable value
+        console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
+        
         let response;
         try {
           // Try primary API endpoint
@@ -67,6 +71,7 @@ export function HeroSection() {
         
         setError(null)
       } catch (err) {
+        console.error("Error details:", err);
         console.error("Error fetching hero slides:", err)
         setError("Failed to load hero content")
         

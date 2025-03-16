@@ -44,7 +44,8 @@ export default function BrandsListPage() {
     const fetchBrands = async () => {
       try {
         setLoading(true)
-        const response = await axios.get("http://localhost:5000/brands/all-brands")
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/brands/all-brands`)
         setBrands(response.data)
         setFilteredBrands(response.data)
       } catch (error) {
@@ -96,7 +97,8 @@ export default function BrandsListPage() {
 
     try {
       setIsDeleting(true)
-      await axios.delete(`http://localhost:5000/brands/${brandToDelete._id}`)
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      await axios.delete(`${apiBaseUrl}/brands/${brandToDelete._id}`)
       
       // Update the brands list
       setBrands(prevBrands => prevBrands.filter(brand => brand._id !== brandToDelete._id))
