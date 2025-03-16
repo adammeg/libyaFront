@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Search, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
+import Image from "next/image"
 import { formatImagePath } from "@/utils/image-helpers"
 
 // Define the slide interface to match your backend schema
@@ -25,6 +26,7 @@ export function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({})
 
   // Fetch slides from API
   useEffect(() => {
@@ -33,22 +35,28 @@ export function HeroSection() {
         setIsLoading(true)
         let response;
         try {
-          // Use the correct endpoints from your routes
-          response = await axios.get("http://localhost:5000/hero-slides/active-slides")
-          console.log("API Response:", response.data); // Debug log
+          // Try primary API endpoint
+          response = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/hero-slides/active-slides" || "http://localhost:5000/hero-slides/active-slides")
+          console.log("API Response:", response.data)
         } catch (error) {
           // Fallback to alternative endpoint
-          response = await axios.get("http://localhost:5000/hero-slides/all-slides")
-          console.log("Fallback API Response:", response.data); // Debug log
+          response = await axios.get(process.env.NEXT_PUBLIC_API_URL + "/hero-slides/all-slides" || "http://localhost:5000/hero-slides/all-slides")
+          console.log("Fallback API Response:", response.data)
         }
         
         if (response.data && response.data.length > 0) {
-          console.log("Setting slides with data:", response.data); // Debug log
-          // Log image paths to debug
+          console.log("Setting slides with data:", response.data)
+          
+          // Debug logging for image paths
           response.data.forEach((slide: HeroSlide, index: number) => {
-            console.log(`Slide ${index} original image path:`, slide.image);
-            console.log(`Slide ${index} transformed image path:`, formatImagePath(slide.image));
-          });
+            console.log(`Slide ${index} image path:`, slide.image)
+            if (slide.image) {
+              console.log(`Slide ${index} transformed path:`, formatImagePath(slide.image))
+            } else {
+              console.warn(`Slide ${index} has no image path`)
+            }
+          })
+          
           setSlides(response.data)
         } else {
           // If empty response, use default slide
@@ -66,7 +74,7 @@ export function HeroSection() {
             _id: "default-1",
             title: "Find Your Perfect Car",
             description: "Explore our extensive inventory of quality vehicles",
-            image: "/hero-default-1.jpg",
+            image: "/placeholder-hero.jpg",
             buttonText: "Browse Cars",
             buttonLink: "/search"
           }
@@ -75,7 +83,7 @@ export function HeroSection() {
         setIsLoading(false)
       }
     }
-    
+
     fetchSlides()
   }, [])
 
@@ -86,7 +94,7 @@ export function HeroSection() {
     const interval = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % slides.length)
     }, 7000) // Change slide every 7 seconds
-  
+
     return () => clearInterval(interval)
   }, [slides.length])
 
@@ -94,54 +102,51 @@ export function HeroSection() {
   const goToNextSlide = useCallback(() => {
     setCurrentSlide(prev => (prev + 1) % slides.length)
   }, [slides.length])
-  
+
   const goToPrevSlide = useCallback(() => {
     setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)
   }, [slides.length])
-  
-  // Get active slide
+
+  // Get active slide or default
   const activeSlide = slides[currentSlide] || {
     title: "Find Your Perfect Car",
     description: "Explore our extensive inventory of quality vehicles",
-    image: "/hero-default-1.jpg",
+    image: "/placeholder-hero.jpg",
     buttonText: "Browse Cars",
     buttonLink: "/search"
   }
 
-  // Test image loading success/failure
-  const handleImageLoad = () => {
-    console.log("Image loaded successfully:", formatImagePath(activeSlide.image));
-  };
-  
-  const handleImageError = () => {
-    console.error("Image failed to load:", formatImagePath(activeSlide.image));
-    // Try direct URL to check if static serving works
-    console.log("Trying direct URL check. Constructed URL:", `http://localhost:5000${activeSlide.image.startsWith('/') ? '' : '/'}${activeSlide.image}`);
-  };
+  // Handle image errors
+  const handleImageError = (slideId: string) => {
+    console.error("Failed to load image for slide:", slideId)
+    setImageLoadErrors(prev => ({ ...prev, [slideId]: true }))
+  }
 
   return (
     <div className="relative min-h-[500px] lg:min-h-[600px] bg-background overflow-hidden">
       {isLoading ? (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="loader"></div>
+        <div className="h-full flex items-center justify-center">
+          <div className="animate-pulse flex flex-col items-center">
+            <div className="h-10 bg-gray-200 rounded w-3/4 max-w-md mb-6"></div>
+            <div className="h-5 bg-gray-200 rounded w-1/2 max-w-sm mb-4"></div>
+            <div className="h-5 bg-gray-200 rounded w-2/5 max-w-sm mb-8"></div>
+            <div className="h-10 bg-gray-200 rounded-full w-40"></div>
+          </div>
         </div>
       ) : (
         <>
-          {/* Debug info */}
-          <div style={{position: 'absolute', top: 0, right: 0, background: 'rgba(0,0,0,0.5)', color: 'white', padding: '5px', zIndex: 1000, fontSize: '10px'}}>
-            Current image: {activeSlide.image}<br/>
-            Formatted: {formatImagePath(activeSlide.image)}
-          </div>
-          
-          {/* Slide background image with overlay */}
+          {/* Slide background */}
           <div className="absolute inset-0 bg-black z-0">
-            <img 
-              src={formatImagePath(activeSlide.image)}
-              alt={activeSlide.title}
-              className="absolute inset-0 w-full h-full object-cover opacity-40"
-              onLoad={handleImageLoad}
-              onError={handleImageError}
-            />
+            {!imageLoadErrors[activeSlide._id] ? (
+              <img
+                src={formatImagePath(activeSlide.image)}
+                alt={activeSlide.title || "Hero image"}
+                className="absolute inset-0 w-full h-full object-cover opacity-40"
+                onError={() => handleImageError(activeSlide._id)}
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-black"></div>
+            )}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30"></div>
           </div>
           
