@@ -39,11 +39,10 @@ export default function SearchPage() {
   const [cars, setCars] = useState<CarData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
   // Get search parameters
-  const type = searchParams.get("type")
-  const brand = searchParams.get("brand")
-  const model = searchParams.get("model")
+  const type = searchParams?.get("type") || null
+  const brand = searchParams?.get("brand") || null
+  const model = searchParams?.get("model") || null
 
   useEffect(() => {
     const fetchSearchResults = async () => {

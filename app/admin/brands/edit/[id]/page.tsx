@@ -30,7 +30,7 @@ const formSchema = z.object({
 export default function EditBrandPage() {
   const params = useParams()
   const router = useRouter()
-  const brandId = params.id as string
+  const brandId = params?.id as string
   
   const [brand, setBrand] = useState<any>(null)
   const [logo, setLogo] = useState<string | null>(null)

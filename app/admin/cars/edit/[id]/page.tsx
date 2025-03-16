@@ -88,7 +88,7 @@ const vehicleTypes = [
 export default function EditCarPage() {
   const params = useParams()
   const router = useRouter()
-  const carId = params.id as string
+  const carId = params?.id as string
   
   const [car, setCar] = useState<Car | null>(null)
   const [photos, setPhotos] = useState<File[]>([])

@@ -60,7 +60,7 @@ const formSchema = z.object({
 export default function EditImporterPage() {
   const params = useParams()
   const router = useRouter()
-  const importerId = params.id as string
+  const importerId = params?.id as string
   
   const [importer, setImporter] = useState<Importer | null>(null)
   const [profileImage, setProfileImage] = useState<string | null>(null)

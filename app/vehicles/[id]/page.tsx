@@ -61,7 +61,7 @@ export default function VehicleDetailPage() {
         setLoading(true)
         setError(null)
         
-        const response = await axios.get(`http://localhost:5000/cars/${params.id}`)
+        const response = await axios.get(`http://localhost:5000/cars/${params?.id}`)
         setCar(response.data)
       } catch (error: any) {
         console.error("Error fetching car details:", error)
@@ -76,10 +76,10 @@ export default function VehicleDetailPage() {
       }
     }
 
-    if (params.id) {
+    if (params?.id) {
       fetchCarDetails()
     }
-  }, [params.id])
+  }, [params?.id])
 
   useEffect(() => {
     const fetchSimilarCars = async () => {
@@ -87,7 +87,7 @@ export default function VehicleDetailPage() {
       
       try {
         setLoadingSimilar(true);
-        const response = await axios.get(`http://localhost:5000/cars/${params.id}/similar`);
+        const response = await axios.get(`http://localhost:5000/cars/${params?.id}/similar`);
         setSimilarCars(response.data);
       } catch (error) {
         console.error("Error fetching similar cars:", error);
@@ -99,7 +99,7 @@ export default function VehicleDetailPage() {
     if (car) {
       fetchSimilarCars();
     }
-  }, [car, params.id]);
+  }, [car, params?.id]);
 
   // Format price
   const formatPrice = (price: string) => {
