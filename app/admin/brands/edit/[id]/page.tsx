@@ -53,7 +53,8 @@ export default function EditBrandPage() {
     const fetchBrand = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(`http://localhost:5000/brands/${brandId}`)
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/brands/${brandId}`)
         const brandData = response.data
         
         setBrand(brandData)
@@ -135,7 +136,8 @@ export default function EditBrandPage() {
         formData.append("logo", logoFile)
       }
       
-      const response = await axios.put(`http://localhost:5000/brands/${brandId}`, formData, {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await axios.put(`${apiBaseUrl}/brands/${brandId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

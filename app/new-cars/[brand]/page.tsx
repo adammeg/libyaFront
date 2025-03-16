@@ -56,7 +56,8 @@ export default function BrandDetailPage() {
         console.log("Fetching brand data for:", brandName)
         
         // First, find the brand by name
-        const brandsResponse = await axios.get("http://localhost:5000/brands/all-brands")
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const brandsResponse = await axios.get(`${apiBaseUrl}/brands/all-brands`)
         console.log("All brands response:", brandsResponse.data)
         
         const foundBrand = brandsResponse.data.find(
@@ -75,10 +76,9 @@ export default function BrandDetailPage() {
         
         // Then, fetch cars for this brand
         // We need to fetch from the cars endpoint with a brand filter
-        const carsResponse = await axios.get(`http://localhost:5000/cars`, {
+        const carsResponse = await axios.get(`${apiBaseUrl}/cars`, {
           params: { brand: foundBrand._id }
         })
-        
         console.log("Cars for brand:", carsResponse.data)
         setCars(carsResponse.data)
       } catch (error: any) {

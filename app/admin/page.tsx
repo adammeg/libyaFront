@@ -75,10 +75,11 @@ export default function AdminDashboard() {
         setLoading(true)
 
         // Fetch all data in parallel
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
         const [importersRes, brandsRes, carsRes] = await Promise.all([
-          axios.get("http://localhost:5000/importers/all-importers"),
-          axios.get("http://localhost:5000/brands/all-brands"),
-          axios.get("http://localhost:5000/cars/all-cars")
+          axios.get(`${apiBaseUrl}/importers/all-importers`),
+          axios.get(`${apiBaseUrl}/brands/all-brands`),
+          axios.get(`${apiBaseUrl}/cars/all-cars`)
         ])
 
         setImporters(importersRes.data)
@@ -340,7 +341,7 @@ export default function AdminDashboard() {
                           <td className="py-3 px-4">
                             {brand.logo && (
                               <img
-                                src={`http://localhost:5000/${brand.logo}`}
+                                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${brand.logo}`}
                                 alt={brand.name}
                                 className="h-10 w-10 object-contain"
                                 onError={(e) => {

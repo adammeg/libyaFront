@@ -51,7 +51,8 @@ export function VehicleSearch() {
     const fetchBrands = async () => {
       try {
         setBrandsLoading(true)
-        const response = await axios.get("http://localhost:5000/brands/all-brands")
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/brands/all-brands`)
         setBrands(response.data)
       } catch (error) {
         console.error("Error fetching brands:", error)
@@ -72,7 +73,8 @@ export function VehicleSearch() {
   useEffect(() => {
     const fetchModels = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/cars/all-cars")
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/cars/all-cars`)
         // Extract unique models from cars
         const uniqueModels = Array.from(
           new Set(response.data.map((car: any) => car.model))
@@ -84,10 +86,10 @@ export function VehicleSearch() {
             brands: car.brands
           }
         })
-        
+
         // Filter out any models with empty strings
         const validModels = uniqueModels.filter(model => model.model.trim() !== '')
-        
+
         setModels(validModels)
       } catch (error) {
         console.error("Error fetching models:", error)
@@ -116,22 +118,22 @@ export function VehicleSearch() {
   // Handle search button click
   const handleSearch = async () => {
     setLoading(true)
-    
+
     // Build query parameters
     const params = new URLSearchParams()
-    
+
     if (selectedType && selectedType !== "") {
       params.append('type', selectedType)
     }
-    
+
     if (selectedBrand && selectedBrand !== "" && selectedBrand !== "all-makes") {
       params.append('brand', selectedBrand)
     }
-    
+
     if (selectedModel && selectedModel !== "" && selectedModel !== "all-models") {
       params.append('model', selectedModel)
     }
-    
+
     // Navigate to search results page
     try {
       await router.push(`/search?${params.toString()}`);
@@ -140,7 +142,7 @@ export function VehicleSearch() {
       toast({
         title: "Error",
         description: "Failed to navigate to search results. Please try again.",
-          variant: "destructive",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -166,9 +168,8 @@ export function VehicleSearch() {
                   <button
                     key={type.label}
                     onClick={() => setSelectedType(type.value)}
-                    className={`flex items-center space-x-4 p-4 rounded-xl transition-colors ${
-                      selectedType === type.value ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                    }`}
+                    className={`flex items-center space-x-4 p-4 rounded-xl transition-colors ${selectedType === type.value ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                      }`}
                   >
                     <type.icon className="h-8 w-8 shrink-0" />
                     <div className="text-left">
@@ -218,8 +219,8 @@ export function VehicleSearch() {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="w-full"
                   onClick={handleSearch}
                   disabled={loading}
@@ -241,9 +242,8 @@ export function VehicleSearch() {
                   <button
                     key={type.label}
                     onClick={() => setSelectedType(type.value)}
-                    className={`flex items-center space-x-4 p-4 rounded-xl transition-colors ${
-                      selectedType === type.value ? "bg-primary/10 text-primary" : "hover:bg-muted"
-                    }`}
+                    className={`flex items-center space-x-4 p-4 rounded-xl transition-colors ${selectedType === type.value ? "bg-primary/10 text-primary" : "hover:bg-muted"
+                      }`}
                   >
                     <type.icon className="h-8 w-8 shrink-0" />
                     <div className="text-left">
@@ -293,8 +293,8 @@ export function VehicleSearch() {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="w-full"
                   onClick={handleSearch}
                   disabled={loading}

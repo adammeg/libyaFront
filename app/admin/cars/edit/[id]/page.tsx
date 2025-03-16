@@ -89,7 +89,7 @@ export default function EditCarPage() {
   const params = useParams()
   const router = useRouter()
   const carId = params?.id as string
-  
+
   const [car, setCar] = useState<Car | null>(null)
   const [photos, setPhotos] = useState<File[]>([])
   const [photosPreviews, setPhotosPreviews] = useState<string[]>([])
@@ -98,7 +98,7 @@ export default function EditCarPage() {
   const [isUploading, setIsUploading] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [message, setMessage] = useState<string>("")
-  
+
   // State for brands and importers data
   const [brands, setBrands] = useState<Brand[]>([])
   const [importers, setImporters] = useState<Importer[]>([])
@@ -122,43 +122,44 @@ export default function EditCarPage() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        
+
         // Fetch all data in parallel
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
         const [carRes, brandsRes, importersRes] = await Promise.all([
-          axios.get(`http://localhost:5000/cars/${carId}`),
-          axios.get("http://localhost:5000/brands/all-brands"),
-          axios.get("http://localhost:5000/importers/all-importers")
+          axios.get(`${apiBaseUrl}/cars/${carId}`),
+          axios.get(`${apiBaseUrl}/brands/all-brands`),
+          axios.get(`${apiBaseUrl}/importers/all-importers`)
         ])
-        
+
         const carData = carRes.data
         setCar(carData)
         setBrands(brandsRes.data)
         setImporters(importersRes.data)
-        
+
         // Set existing photos
         if (carData.photos && Array.isArray(carData.photos)) {
           setExistingPhotos(carData.photos)
         }
-        
+
         // Set form values
         form.setValue("model", carData.model)
         form.setValue("type", carData.type || "SEDAN")
         form.setValue("price", carData.price)
         form.setValue("description", carData.description)
-        
+
         // Set importer
         const importerId = typeof carData.importer === 'object' ? carData.importer._id : carData.importer
         form.setValue("importer", importerId)
-        
+
         // Handle importer change to set available brands
         handleImporterChange(importerId)
-        
+
         // Set brands
-        const brandIds = Array.isArray(carData.brands) 
+        const brandIds = Array.isArray(carData.brands)
           ? carData.brands.map((brand: any) => typeof brand === 'object' ? brand._id : brand)
           : []
         form.setValue("brands", brandIds.join(","))
-        
+
       } catch (err) {
         console.error("Error fetching data:", err)
         toast({
@@ -170,7 +171,7 @@ export default function EditCarPage() {
         setLoading(false)
       }
     }
-    
+
     fetchData()
   }, [carId, form])
 
@@ -180,13 +181,13 @@ export default function EditCarPage() {
     if (selectedImporter) {
       // Reset selected brands when importer changes
       form.setValue("brands", "")
-      
+
       // Filter brands based on the selected importer
       if (Array.isArray(selectedImporter.brands)) {
-        const importerBrands = selectedImporter.brands.map(brand => 
+        const importerBrands = selectedImporter.brands.map(brand =>
           typeof brand === 'object' ? brand : brands.find(b => b._id === brand)
         ).filter(Boolean) as Brand[]
-        
+
         setSelectedImporterBrands(importerBrands)
       }
     }
@@ -235,7 +236,7 @@ export default function EditCarPage() {
       setPhotos((prev) => [...prev, file])
       setIsUploading(false)
       setUploadProgress(100)
-      
+
       // Clear progress after a delay
       setTimeout(() => {
         setUploadProgress(0)
@@ -267,29 +268,29 @@ export default function EditCarPage() {
 
       // Create FormData object
       const formData = new FormData()
-      
+
       // Append text fields
       formData.append("model", data.model)
       formData.append("type", data.type)
       formData.append("price", data.price)
       formData.append("description", data.description)
       formData.append("importer", data.importer)
-      
+
       // Append brands as separate fields with the same name
       data.brands.split(",").forEach(brandId => {
         formData.append("brands", brandId)
       })
-      
+
       // Append existing photos
       existingPhotos.forEach(photo => {
         formData.append("existingPhotos", photo)
       })
-      
+
       // Append new photos
       photos.forEach(photo => {
         formData.append("photos", photo)
       })
-      
+
       console.log("Form data being sent:", {
         model: data.model,
         type: data.type,
@@ -300,23 +301,24 @@ export default function EditCarPage() {
         existingPhotoCount: existingPhotos.length,
         newPhotoCount: photos.length
       })
-      
+
       // Send the request
-      const response = await axios.put(`http://localhost:5000/cars/${carId}`, formData, {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await axios.put(`${apiBaseUrl}/cars/${carId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
-      
+
       // Handle success
       toast({
         title: "Success",
         description: "Car updated successfully!",
       })
-      
+
       // Navigate back to cars list
       router.push("/admin/cars-list")
-      
+
     } catch (error) {
       console.error("Error submitting form:", error)
       setMessage("Failed to update car. Please try again.")
@@ -354,7 +356,7 @@ export default function EditCarPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} encType="multipart/form-data" className="space-y-8">
             {message && <p className={`text-sm ${message.includes("success") ? "text-green-500" : "text-red-500"}`}>{message}</p>}
-            
+
             {/* Photos Upload */}
             <FormField
               control={form.control}
@@ -368,8 +370,8 @@ export default function EditCarPage() {
                       {existingPhotos.map((photo, index) => (
                         <div key={`existing-${index}`} className="relative aspect-[3/2] overflow-hidden rounded-lg border">
                           <img
-                            src={photo.startsWith('http') 
-                              ? photo 
+                            src={photo.startsWith('http')
+                              ? photo
                               : `http://localhost:5000/${photo.replace(/^uploads\//, '')}`}
                             alt={`Car photo ${index + 1}`}
                             className="h-full w-full object-cover"
@@ -387,7 +389,7 @@ export default function EditCarPage() {
                           </button>
                         </div>
                       ))}
-                      
+
                       {/* New Photos */}
                       {photosPreviews.map((preview, index) => (
                         <div key={`new-${index}`} className="relative aspect-[3/2] overflow-hidden rounded-lg border">
@@ -405,7 +407,7 @@ export default function EditCarPage() {
                           </button>
                         </div>
                       ))}
-                      
+
                       {/* Upload Button */}
                       <div className="relative aspect-[3/2] overflow-hidden rounded-lg border">
                         <input
@@ -434,7 +436,7 @@ export default function EditCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Importer Selection */}
             <FormField
               control={form.control}
@@ -468,7 +470,7 @@ export default function EditCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Brands Selection */}
             <FormField
               control={form.control}
@@ -500,12 +502,12 @@ export default function EditCarPage() {
                                     return checked
                                       ? field.onChange([...field.value || [], brand._id])
                                       : field.onChange(
-                                          Array.isArray(field.value) 
-                                            ? field.value.filter(
-                                                (value: string) => value !== brand._id
-                                              )
-                                            : []
-                                        )
+                                        Array.isArray(field.value)
+                                          ? field.value.filter(
+                                            (value: string) => value !== brand._id
+                                          )
+                                          : []
+                                      )
                                   }}
                                 />
                               </FormControl>
@@ -522,7 +524,7 @@ export default function EditCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Model */}
             <FormField
               control={form.control}
@@ -538,7 +540,7 @@ export default function EditCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Price */}
             <FormField
               control={form.control}
@@ -554,7 +556,7 @@ export default function EditCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Description */}
             <FormField
               control={form.control}
@@ -570,7 +572,7 @@ export default function EditCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Vehicle Type */}
             <FormField
               control={form.control}
@@ -600,7 +602,7 @@ export default function EditCarPage() {
                 </FormItem>
               )}
             />
-            
+
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>

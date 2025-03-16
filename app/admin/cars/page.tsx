@@ -84,7 +84,7 @@ export default function NewCarPage() {
   const [isUploading, setIsUploading] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [message, setMessage] = useState<string>("")
-  
+
   // State for brands and importers data
   const [brands, setBrands] = useState<Brand[]>([])
   const [importers, setImporters] = useState<Importer[]>([])
@@ -107,13 +107,14 @@ export default function NewCarPage() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+
         // Fetch all data in parallel
         const [brandsRes, importersRes] = await Promise.all([
-          axios.get("http://localhost:5000/brands/all-brands"),
-          axios.get("http://localhost:5000/importers/all-importers")
+          axios.get(`${apiBaseUrl}/brands/all-brands`),
+          axios.get(`${apiBaseUrl}/importers/all-importers`)
         ])
-        
+
         setBrands(brandsRes.data)
         setImporters(importersRes.data)
       } catch (err) {
@@ -127,7 +128,7 @@ export default function NewCarPage() {
         setLoading(false)
       }
     }
-    
+
     fetchData()
   }, [])
 
@@ -137,13 +138,13 @@ export default function NewCarPage() {
     if (selectedImporter) {
       // Reset selected brands when importer changes
       form.setValue("brands", "")
-      
+
       // Filter brands based on the selected importer
       if (Array.isArray(selectedImporter.brands)) {
-        const importerBrands = selectedImporter.brands.map(brand => 
+        const importerBrands = selectedImporter.brands.map(brand =>
           typeof brand === 'object' ? brand : brands.find(b => b._id === brand)
         ).filter(Boolean) as Brand[]
-        
+
         setSelectedImporterBrands(importerBrands)
       }
     }
@@ -222,10 +223,10 @@ export default function NewCarPage() {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsSubmitting(true)
-      
+
       // Create FormData object to send files
       const formData = new FormData()
-      
+
       // Append text fields
       formData.append('model', data.model)
       formData.append('type', data.type)
@@ -233,12 +234,12 @@ export default function NewCarPage() {
       formData.append('description', data.description)
       formData.append('importer', data.importer)
       formData.append('brands', data.brands)
-      
+
       // Append photos
       photos.forEach(photo => {
         formData.append('photos', photo)
       })
-      
+
       // Check if at least one photo is uploaded
       if (photos.length === 0) {
         toast({
@@ -249,10 +250,11 @@ export default function NewCarPage() {
         setIsSubmitting(false)
         return
       }
-      
+
       // Send the request with progress tracking
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
       const response = await axios.post(
-        'http://localhost:5000/cars/create',
+        `${apiBaseUrl}/cars/create`,
         formData,
         {
           headers: {
@@ -266,18 +268,18 @@ export default function NewCarPage() {
           },
         }
       )
-      
+
       toast({
         title: "Success",
         description: "Vehicle added successfully!",
       })
-      
+
       // Reset form and state
       form.reset()
       setPhotos([])
       setPhotosPreviews([])
       setUploadProgress(0)
-      
+
       // Redirect to the car list or the new car's detail page
       router.push('/admin/cars-list')
     } catch (error: any) {
@@ -306,7 +308,7 @@ export default function NewCarPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} encType="multipart/form-data" className="space-y-8">
             {message && <p className={`text-sm ${message.includes("success") ? "text-green-500" : "text-red-500"}`}>{message}</p>}
-            
+
             {/* Car Photos */}
             <FormItem className="col-span-full">
               <FormLabel>Vehicle Photos</FormLabel>
@@ -332,7 +334,7 @@ export default function NewCarPage() {
               </FormDescription>
               <FormMessage />
             </FormItem>
-            
+
             {/* Importer Selection */}
             <FormField
               control={form.control}
@@ -340,11 +342,11 @@ export default function NewCarPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Importer</FormLabel>
-                  <Select 
+                  <Select
                     onValueChange={(value) => {
                       field.onChange(value)
                       handleImporterChange(value)
-                    }} 
+                    }}
                     defaultValue={field.value}
                   >
                     <FormControl>
@@ -365,7 +367,7 @@ export default function NewCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Brands Selection */}
             <FormField
               control={form.control}
@@ -413,7 +415,7 @@ export default function NewCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Model */}
             <FormField
               control={form.control}
@@ -429,7 +431,7 @@ export default function NewCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Price */}
             <FormField
               control={form.control}
@@ -445,7 +447,7 @@ export default function NewCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Description */}
             <FormField
               control={form.control}
@@ -461,7 +463,7 @@ export default function NewCarPage() {
                 </FormItem>
               )}
             />
-            
+
             {/* Vehicle Type */}
             <FormField
               control={form.control}
@@ -491,7 +493,7 @@ export default function NewCarPage() {
                 </FormItem>
               )}
             />
-            
+
             <Button type="submit" disabled={isSubmitting || loading}>
               {isSubmitting ? (
                 <>

@@ -127,7 +127,8 @@ export default function NewBrandPage() {
     formData.append('logo', logoFile) // Append the actual File object
 
     try {
-      const res = await axios.post('http://localhost:5000/brands/create', formData, {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const res = await axios.post(`${apiBaseUrl}/brands/create`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

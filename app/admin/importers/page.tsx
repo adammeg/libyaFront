@@ -22,9 +22,9 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif
 
 // Define the interface for brand data from your API
 interface Brand {
-    _id: string
-    name: string
-    // Add other fields that your API returns
+  _id: string
+  name: string
+  // Add other fields that your API returns
 }
 
 const formSchema = z.object({
@@ -41,8 +41,8 @@ const formSchema = z.object({
     message: "Invalid email address.",
   }),
   profileImage: z.any().optional(),
-    brands: z.array(z.string()).min(1, {
-        message: "You must select at least one brand.",
+  brands: z.array(z.string()).min(1, {
+    message: "You must select at least one brand.",
   }),
 })
 
@@ -51,9 +51,9 @@ export default function NewImporterPage() {
   const [uploadProgress, setUploadProgress] = useState<number>(0)
   const [isUploading, setIsUploading] = useState<boolean>(false)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-    const [brands, setBrands] = useState<Brand[]>([])
-    const [isLoading, setIsLoading] = useState(true)
-    const [message, setMessage] = useState<string>("")
+  const [brands, setBrands] = useState<Brand[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [message, setMessage] = useState<string>("")
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -62,14 +62,15 @@ export default function NewImporterPage() {
       address: "",
       telephone: "",
       email: "",
-            brands: [],
+      brands: [],
     },
   })
 
   useEffect(() => {
     const fetchBrands = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/brands/all-brands")
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+        const response = await axios.get(`${apiBaseUrl}/brands/all-brands`)
         setBrands(response.data)
       } catch (error) {
         console.error("Error fetching brands:", error)
@@ -78,8 +79,8 @@ export default function NewImporterPage() {
           description: "There was a problem fetching brands. Please try again.",
           variant: "destructive",
         })
-            } finally {
-                setIsLoading(false)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -101,7 +102,7 @@ export default function NewImporterPage() {
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       toast({
         title: "Error",
-                description: "Invalid file type. Only JPEG, JPG, PNG and GIF are allowed.",
+        description: "Invalid file type. Only JPEG, JPG, PNG and GIF are allowed.",
         variant: "destructive",
       })
       return
@@ -144,38 +145,39 @@ export default function NewImporterPage() {
     form.setValue("profileImage", null)
   }, [form])
 
-    const handleSubmitForm = async (e: React.FormEvent) => {
-        e.preventDefault()
+  const handleSubmitForm = async (e: React.FormEvent) => {
+    e.preventDefault()
 
     setIsSubmitting(true)
-        setMessage('')
+    setMessage('')
 
-        const formData = new FormData()
-        formData.append('name', form.watch('name'))
-        formData.append('address', form.watch('address'))
-        formData.append('telephone', form.watch('telephone'))
-        formData.append('email', form.watch('email'))
+    const formData = new FormData()
+    formData.append('name', form.watch('name'))
+    formData.append('address', form.watch('address'))
+    formData.append('telephone', form.watch('telephone'))
+    formData.append('email', form.watch('email'))
 
-        if (form.watch('profileImage')) {
-            formData.append('profileImage', form.watch('profileImage'))
-        }
+    if (form.watch('profileImage')) {
+      formData.append('profileImage', form.watch('profileImage'))
+    }
 
-        // Append each brand ID individually
-        form.watch("brands").forEach((brandId: string) => {
-            formData.append('brands', brandId)
-        })
+    // Append each brand ID individually
+    form.watch("brands").forEach((brandId: string) => {
+      formData.append('brands', brandId)
+    })
 
-        try {
-            const response = await axios.post("http://localhost:5000/importers/create", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-            setMessage('Importer created successfully!')
+    try {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await axios.post(`${apiBaseUrl}/importers/create`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      setMessage('Importer created successfully!')
       form.reset()
       setProfileImage(null)
-        } catch (error: any) {
-            setMessage(error.response?.data?.message || 'An error occurred.')
+    } catch (error: any) {
+      setMessage(error.response?.data?.message || 'An error occurred.')
     } finally {
       setIsSubmitting(false)
     }
@@ -191,7 +193,7 @@ export default function NewImporterPage() {
       <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
         <div className="flex-1 lg:max-w-2xl">
           <Form {...form}>
-                        <form onSubmit={handleSubmitForm} encType="multipart/form-data" className="space-y-8">
+            <form onSubmit={handleSubmitForm} encType="multipart/form-data" className="space-y-8">
               <FormField
                 control={form.control}
                 name="name"
@@ -250,116 +252,116 @@ export default function NewImporterPage() {
               />
               <FormField
                 control={form.control}
-                                name="brands"
-                                render={() => (
-                                    <FormItem>
-                                        <FormLabel>Brands</FormLabel>
-                                        {isLoading ? (
-                                            <div className="flex items-center justify-center p-8">
-                                                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-                                            </div>
-                                        ) : brands.length === 0 ? (
-                                            <p className="text-center text-muted-foreground py-8">No brands found.</p>
-                                        ) : (
-                                            <>
-                                                <div className="mb-4">
-                                                    <FormDescription>Select the brands associated with the importer.</FormDescription>
-                                                </div>
-                                                {brands.map((brand) => (
-                                                    <FormField
-                                                        key={brand._id}
-                                                        control={form.control}
-                                                        name="brands"
-                                                        render={({ field }) => {
-                                                            return (
-                                                                <FormItem key={brand._id} className="flex flex-row items-start space-x-3 space-y-0">
-                                                                    <FormControl>
-                                                                        <Checkbox
-                                                                            checked={field.value?.includes(brand._id)}
-                                                                            onCheckedChange={(checked) => {
-                                                                                return checked
-                                                                                    ? field.onChange([...field.value, brand._id])
-                                                                                    : field.onChange(field.value?.filter((value) => value !== brand._id))
-                                                                            }}
-                                                                        />
-                                                                    </FormControl>
-                                                                    <FormLabel className="font-normal">{brand.name}</FormLabel>
-                                                                </FormItem>
-                                                            )
-                                                        }}
-                                                    />
-                                                ))}
-                                            </>
-                                        )}
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="profileImage"
-                render={({ field }) => (
+                name="brands"
+                render={() => (
                   <FormItem>
-                                        <FormLabel>Profile Image</FormLabel>
-                      <FormControl>
-                                            <div
-                                                className={`relative aspect-square overflow-hidden rounded-lg border-2 border-dashed ${profileImage ? "border-transparent" : "border-muted-foreground/25"
-                                                    }`}
-                                                onDrop={handleDrop}
-                                                onDragOver={handleDragOver}
-                                            >
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    className="absolute inset-0 z-[2] cursor-pointer opacity-0"
-                                                    {...field}
-                                                    onChange={(e) => {
-                                                        const file = e.target.files?.[0]
-                                                        if (file) {
-                                                            handleProfileImageUpload(file)
-                                                            field.onChange(file)
-                                                        }
-                                                    }}
-                                                />
-                                                {profileImage ? (
-                                                    <div className="relative h-full">
-                                                        <img src={profileImage} alt="Importer profile image preview" className="h-full w-full object-cover" />
-                                                        <button
-                                                            type="button"
-                                                            onClick={removeProfileImage}
-                                                            className="absolute right-2 top-2 rounded-full bg-black/50 p-1 text-white hover:bg-black/75"
-                                                        >
-                                                            <X className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex h-full items-center justify-center bg-secondary">
-                                                        <Upload className="h-16 w-16 text-muted-foreground" />
-                                                    </div>
-                                                )}
-                                                {isUploading && (
-                                                    <div className="absolute inset-x-0 bottom-0 bg-black/50 p-2">
-                                                        <Progress value={uploadProgress} className="h-1" />
-                                                    </div>
-                                                )}
-                                            </div>
-                      </FormControl>
-                                        <FormDescription>Upload a profile image for the importer.</FormDescription>
+                    <FormLabel>Brands</FormLabel>
+                    {isLoading ? (
+                      <div className="flex items-center justify-center p-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                      </div>
+                    ) : brands.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">No brands found.</p>
+                    ) : (
+                      <>
+                        <div className="mb-4">
+                          <FormDescription>Select the brands associated with the importer.</FormDescription>
+                        </div>
+                        {brands.map((brand) => (
+                          <FormField
+                            key={brand._id}
+                            control={form.control}
+                            name="brands"
+                            render={({ field }) => {
+                              return (
+                                <FormItem key={brand._id} className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(brand._id)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([...field.value, brand._id])
+                                          : field.onChange(field.value?.filter((value) => value !== brand._id))
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">{brand.name}</FormLabel>
+                                </FormItem>
+                              )
+                            }}
+                          />
+                        ))}
+                      </>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
               />
-                            <Button type="submit" disabled={isSubmitting || !form.formState.isValid} className="w-full">
-                                {isSubmitting ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Saving...
-                                    </>
-                                ) : (
-                                    "Add Importer"
-                                )}
+              <FormField
+                control={form.control}
+                name="profileImage"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Profile Image</FormLabel>
+                    <FormControl>
+                      <div
+                        className={`relative aspect-square overflow-hidden rounded-lg border-2 border-dashed ${profileImage ? "border-transparent" : "border-muted-foreground/25"
+                          }`}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                      >
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="absolute inset-0 z-[2] cursor-pointer opacity-0"
+                          {...field}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                              handleProfileImageUpload(file)
+                              field.onChange(file)
+                            }
+                          }}
+                        />
+                        {profileImage ? (
+                          <div className="relative h-full">
+                            <img src={profileImage} alt="Importer profile image preview" className="h-full w-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={removeProfileImage}
+                              className="absolute right-2 top-2 rounded-full bg-black/50 p-1 text-white hover:bg-black/75"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-secondary">
+                            <Upload className="h-16 w-16 text-muted-foreground" />
+                          </div>
+                        )}
+                        {isUploading && (
+                          <div className="absolute inset-x-0 bottom-0 bg-black/50 p-2">
+                            <Progress value={uploadProgress} className="h-1" />
+                          </div>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormDescription>Upload a profile image for the importer.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isSubmitting || !form.formState.isValid} className="w-full">
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Add Importer"
+                )}
               </Button>
-                            {message && <p className="text-sm text-red-500">{message}</p>}
+              {message && <p className="text-sm text-red-500">{message}</p>}
             </form>
           </Form>
         </div>
@@ -386,7 +388,7 @@ export default function NewImporterPage() {
                   <p className="text-sm text-muted-foreground">{form.watch("telephone")}</p>
                   <p className="text-sm text-muted-foreground">{form.watch("email")}</p>
                   <p className="text-sm text-muted-foreground">
-                                        Brands: {form.watch("brands")?.map((id) => brands.find((brand) => brand._id === id)?.name).join(", ") || "N/A"}
+                    Brands: {form.watch("brands")?.map((id) => brands.find((brand) => brand._id === id)?.name).join(", ") || "N/A"}
                   </p>
                 </div>
               </div>

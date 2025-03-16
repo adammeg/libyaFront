@@ -61,7 +61,7 @@ export default function EditImporterPage() {
   const params = useParams()
   const router = useRouter()
   const importerId = params?.id as string
-  
+
   const [importer, setImporter] = useState<Importer | null>(null)
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null)
@@ -71,7 +71,7 @@ export default function EditImporterPage() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(true)
   const [brands, setBrands] = useState<Brand[]>([])
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -82,36 +82,36 @@ export default function EditImporterPage() {
       brands: [],
     },
   })
-  
+
   // Fetch importer and brands data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
         // Fetch importer and brands in parallel
         const [importerRes, brandsRes] = await Promise.all([
-          axios.get(`http://localhost:5000/importers/${importerId}`),
-          axios.get("http://localhost:5000/brands/all-brands")
+          axios.get(`${apiBaseUrl}/importers/${importerId}`),
+          axios.get(`${apiBaseUrl}/brands/all-brands`)
         ])
-        
+
         const importerData = importerRes.data
         setImporter(importerData)
         setProfileImage(importerData.profileImage || null)
         setBrands(brandsRes.data)
-        
+
         // Set form values
         form.setValue("name", importerData.name)
         form.setValue("address", importerData.address)
         form.setValue("telephone", importerData.telephone)
         form.setValue("email", importerData.email)
-        
+
         // Set brands
-        const brandIds = Array.isArray(importerData.brands) 
+        const brandIds = Array.isArray(importerData.brands)
           ? importerData.brands.map((brand: any) => typeof brand === 'object' ? brand._id : brand)
           : []
         form.setValue("brands", brandIds)
-        
+
       } catch (error) {
         console.error("Error fetching data:", error)
         toast({
@@ -123,10 +123,10 @@ export default function EditImporterPage() {
         setLoading(false)
       }
     }
-    
+
     fetchData()
   }, [importerId, form])
-  
+
   // Handle profile image upload
   const handleProfileImageUpload = (file: File) => {
     if (file.size > MAX_FILE_SIZE) {
@@ -137,7 +137,7 @@ export default function EditImporterPage() {
       })
       return
     }
-    
+
     if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
       toast({
         title: "Error",
@@ -146,9 +146,9 @@ export default function EditImporterPage() {
       })
       return
     }
-    
+
     setProfileImageFile(file)
-    
+
     // Create preview
     const reader = new FileReader()
     reader.onloadstart = () => {
@@ -166,45 +166,46 @@ export default function EditImporterPage() {
     }
     reader.readAsDataURL(file)
   }
-  
+
   // Remove profile image
   const removeProfileImage = () => {
     setProfileImageFile(null)
     setProfileImagePreview(null)
     form.setValue("profileImage", undefined)
   }
-  
+
   // Handle form submission
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsSubmitting(true)
-      
+
       const formData = new FormData()
       formData.append("name", data.name)
       formData.append("address", data.address)
       formData.append("telephone", data.telephone)
       formData.append("email", data.email)
-      
+
       // Append each brand ID individually
       data.brands.forEach(brandId => {
         formData.append("brands", brandId)
       })
-      
+
       if (profileImageFile) {
         formData.append("profileImage", profileImageFile)
       }
-      
-      const response = await axios.put(`http://localhost:5000/importers/${importerId}`, formData, {
+
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+      const response = await axios.put(`${apiBaseUrl}/importers/${importerId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
-      
+
       toast({
         title: "Success",
         description: "Importer updated successfully!",
       })
-      
+
       // Navigate back to importers list
       router.push("/admin/importers-list")
     } catch (error) {
@@ -218,7 +219,7 @@ export default function EditImporterPage() {
       setIsSubmitting(false)
     }
   }
-  
+
   if (loading) {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
@@ -226,7 +227,7 @@ export default function EditImporterPage() {
       </div>
     )
   }
-  
+
   return (
     <div className="container py-10">
       <div className="space-y-6 p-2 pb-16 md:p-6">
@@ -237,7 +238,7 @@ export default function EditImporterPage() {
           </p>
         </div>
         <Separator className="my-6" />
-        
+
         {loading ? (
           <div className="flex h-[400px] w-full items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -326,7 +327,7 @@ export default function EditImporterPage() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="grid gap-4 sm:grid-cols-2">
                     <FormField
                       control={form.control}
@@ -342,7 +343,7 @@ export default function EditImporterPage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="telephone"
@@ -358,7 +359,7 @@ export default function EditImporterPage() {
                       )}
                     />
                   </div>
-                  
+
                   <FormField
                     control={form.control}
                     name="email"
@@ -373,7 +374,7 @@ export default function EditImporterPage() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="address"
@@ -388,7 +389,7 @@ export default function EditImporterPage() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="brands"
@@ -419,10 +420,10 @@ export default function EditImporterPage() {
                                           return checked
                                             ? field.onChange([...field.value, brand._id])
                                             : field.onChange(
-                                                field.value?.filter(
-                                                  (value) => value !== brand._id
-                                                )
+                                              field.value?.filter(
+                                                (value) => value !== brand._id
                                               )
+                                            )
                                         }}
                                       />
                                     </FormControl>
@@ -439,7 +440,7 @@ export default function EditImporterPage() {
                       </FormItem>
                     )}
                   />
-                  
+
                   <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
                     {isSubmitting ? (
                       <>
@@ -453,7 +454,7 @@ export default function EditImporterPage() {
                 </form>
               </Form>
             </div>
-            
+
             <div className="flex flex-col space-y-4 lg:w-80">
               <div className="space-y-2">
                 <h3 className="text-lg font-medium">Preview</h3>
