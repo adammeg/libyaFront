@@ -98,6 +98,23 @@ export default function SearchPage() {
       <div className="container py-12">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Search Results</h1>
+          <div className="flex flex-wrap gap-2">
+            {type && (
+              <div className="bg-muted px-3 py-1 rounded-full text-sm">
+                Type: {type}
+              </div>
+            )}
+            {brand && (
+              <div className="bg-muted px-3 py-1 rounded-full text-sm">
+                Brand: {brand}
+              </div>
+            )}
+            {model && (
+              <div className="bg-muted px-3 py-1 rounded-full text-sm">
+                Model: {model}
+              </div>
+            )}
+          </div>
         </div>
 
         {loading ? (
