@@ -24,7 +24,8 @@ export function FeaturedBrands() {
         const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
         const response = await axios.get(`${apiBaseUrl}/brands/all-brands`)
         console.log("Brands data:", response.data)
-        setBrands(response.data)
+        const activeBrands = response.data.filter((brand: { isActive?: boolean }) => brand.isActive !== false)
+        setBrands(activeBrands.slice(0, 5))
         setError(null)
       } catch (error: any) {
         console.error("Error fetching brands:", error)
@@ -50,7 +51,7 @@ export function FeaturedBrands() {
           {brands.map((brand) => (
             <Link 
               key={brand._id} 
-              href={`/new-cars/${brand.name.toLowerCase()}`}
+              href={`/new-cars/${brand.name.toUpperCase()}`}
               className="group"
             >
               <div className="bg-white border rounded-lg p-4 h-32 flex flex-col items-center justify-center transition-all hover:shadow-md hover:border-primary">
