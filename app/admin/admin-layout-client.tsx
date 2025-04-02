@@ -1,17 +1,17 @@
 "use client"
 
 import React, { useState } from "react"
-import { MainNav } from "@/components/main-nav"
 import Link from "next/link"
 import { Icons } from "@/components/icons"
-import { Menu, X } from "lucide-react"
+import { Menu, X, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
 
 const sidebarNavItems = [
   {
     title: "Dashboard",
-    href: "/admin",
+    href: "/admin/dashboard",
     icon: "layout-dashboard",
   },
   {
@@ -45,19 +45,9 @@ const sidebarNavItems = [
     icon: "plus-circle",
   },
   {
-    title: "Users",
-    href: "/admin/users",
-    icon: "users",
-  },
-  {
-    title: "Settings",
-    href: "/admin/settings",
-    icon: "settings",
-  },
-  {
     title: "Hero Slides",
     href: "/admin/hero-slides",
-    icon: "settings",
+    icon: "image",
   },
 ]
 
@@ -67,10 +57,41 @@ interface AdminLayoutClientProps {
 
 export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { logout, user } = useAuth()
 
   return (
     <div className="flex min-h-screen flex-col">
-      <MainNav />
+      <header className="sticky top-0 z-40 border-b bg-background">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+            <Link href="/" className="flex items-center space-x-2 ml-2">
+              <Icons.car className="h-6 w-6" />
+              <span className="font-bold">Libya Auto Admin</span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-2">
+            {user && (
+              <>
+                <span className="text-sm font-medium hidden md:inline-block">
+                  Welcome, {user.username}
+                </span>
+                <Button variant="outline" size="sm" onClick={logout}>
+                  <LogOut className="h-4 w-4 mr-1" />
+                  <span className="hidden md:inline-block">Logout</span>
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
       <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
         {/* Mobile sidebar toggle */}
         <Button

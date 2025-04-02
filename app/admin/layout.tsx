@@ -1,4 +1,6 @@
 import type { Metadata } from "next"
+import { AuthProvider } from "@/context/auth-context"
+import { ProtectedRoute } from "@/components/protected-route"
 import { AdminLayoutClient } from "./admin-layout-client"
 
 export const metadata: Metadata = {
@@ -11,6 +13,12 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  return <AdminLayoutClient>{children}</AdminLayoutClient>
+  return (
+    <AuthProvider>
+      <ProtectedRoute>
+        <AdminLayoutClient>{children}</AdminLayoutClient>
+      </ProtectedRoute>
+    </AuthProvider>
+  )
 }
 
