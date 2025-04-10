@@ -4,7 +4,7 @@ const nextTranslate = require('next-translate-plugin')
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['https://libya-auto-nyx6.vercel.app/'],
+    domains: ['libya-auto-nyx6.vercel.app'],
   },
 }
 

@@ -28,20 +28,34 @@ export default function RootLayout({
   children: React.ReactNode
   params: { locale: string }
 }) {
-  const isRtl = params.locale === "ar"
-  
-  return (
-    <html 
-      lang={params.locale} 
-      dir={isRtl ? "rtl" : "ltr"}
-      className={`${inter.variable} ${ibmPlexSansArabic.variable}`}
-    >
-      <body className={isRtl ? "font-arabic" : "font-sans"}>
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
-      </body>
-    </html>
-  )
+  // Add error catching
+  try {
+    const isRtl = params.locale === "ar"
+    
+    return (
+      <html 
+        lang={params.locale} 
+        dir={isRtl ? "rtl" : "ltr"}
+        className={`${inter.variable} ${ibmPlexSansArabic.variable}`}
+      >
+        <body className={isRtl ? "font-arabic" : "font-sans"}>
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </body>
+      </html>
+    )
+  } catch (error) {
+    console.error("Layout error:", error)
+    // Return a simple fallback layout
+    return (
+      <html>
+        <body>
+          <h1>An error occurred in the layout</h1>
+          <pre>{JSON.stringify(error, null, 2)}</pre>
+        </body>
+      </html>
+    )
+  }
 } 

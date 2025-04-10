@@ -6,6 +6,7 @@ import { NewsList } from "@/components/news-list"
 import { Footer } from "@/components/footer"
 import { FeaturedBrands } from "@/components/featured-brands"
 import useTranslation from "next-translate/useTranslation"
+import { redirect } from 'next/navigation'
 
 export default function Home() {
   const { t } = useTranslation("home")
@@ -30,5 +31,10 @@ export default function Home() {
       </main>
     </div>
   )
+}
+
+export function RootPage() {
+  // Redirect to the default locale
+  redirect('/ar')
 }
 
