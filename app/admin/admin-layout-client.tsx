@@ -49,6 +49,16 @@ const sidebarNavItems = [
     href: "/admin/hero-slides",
     icon: "image",
   },
+  {
+    title: "Blog",
+    href: "/admin/blog",
+    icon: "file-text",
+  },
+  {
+    title: "New Blog Post",
+    href: "/admin/blog/new",
+    icon: "plus-circle",
+  },
 ]
 
 interface AdminLayoutClientProps {

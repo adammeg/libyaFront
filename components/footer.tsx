@@ -9,10 +9,10 @@ export function Footer() {
           <div>
             <Link href="/" className="flex items-center space-x-2">
               <Car className="h-6 w-6" />
-              <span className="font-bold">AutoMobile TN</span>
+              <span className="font-bold">libyaauto</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
-              Your trusted source for quality vehicles in Tunisia. Find the perfect car for your needs.
+              Your trusted source for quality vehicles in Libya. Find the perfect car for your needs.
             </p>
             <div className="mt-6 flex space-x-4">
               <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -93,14 +93,14 @@ export function Footer() {
             <h3 className="font-semibold mb-4">Contact Us</h3>
             <address className="not-italic text-sm text-muted-foreground space-y-2">
               <p>123 Auto Street</p>
-              <p>Tunis, Tunisia</p>
-              <p>Email: info@automobiletn.com</p>
-              <p>Phone: +216 71 123 456</p>
+              <p>Tripoli, Libya</p>
+              <p>Email: info@libyaauto.com</p>
+              <p>Phone: +218 91 123 456</p>
             </address>
           </div>
         </div>
         <div className="mt-10 pt-6 border-t text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} AutoMobile TN. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} libyaauto. All rights reserved.</p>
         </div>
       </div>
     </footer>

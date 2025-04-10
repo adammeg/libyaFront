@@ -1,56 +1,129 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
+import Link from "next/link"
+import axios from "axios"
+import { formatImagePath } from "@/utils/image-helpers"
+import { api } from "@/utils/api-helpers"
 
-const newsArticles = [
-  {
-    id: 1,
-    title: "New Import Regulations for Luxury Vehicles in Libya",
-    description: "The Libyan government announces changes to import policies affecting high-end car markets.",
-    image: "/placeholder.svg?height=200&width=400",
-    date: "2025-02-15",
-  },
-  {
-    id: 2,
-    title: "Electric Vehicle Charging Stations Planned for Major Cities",
-    description: "Initiative to install EV charging infrastructure in Tripoli, Benghazi, and Misrata gains momentum.",
-    image: "/placeholder.svg?height=200&width=400",
-    date: "2025-02-10",
-  },
-  {
-    id: 3,
-    title: "Local Automotive Manufacturing Plant Breaks Ground",
-    description: "A new factory aimed at boosting domestic car production opens its doors in Zawiya.",
-    image: "/placeholder.svg?height=200&width=400",
-    date: "2025-02-05",
-  },
-]
+interface BlogPost {
+  _id: string
+  title: string
+  slug: string
+  excerpt: string
+  featuredImage: string | null
+  author: {
+    username: string
+  }
+  createdAt: string
+}
+
+interface PaginationData {
+  total: number
+  page: number
+  pages: number
+}
 
 export function NewsList() {
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [pagination, setPagination] = useState<PaginationData>({ total: 0, page: 1, pages: 1 })
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true)
+        const response = await api.get('/blog/published', { limit: '3' }) // Limit to 3 posts for homepage
+        setPosts(response.data.posts)
+        setPagination(response.data.pagination)
+      } catch (error) {
+        console.error("Error fetching blog posts:", error)
+        setError("Failed to load latest articles")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchPosts()
+  }, [])
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric", 
+      month: "long", 
+      day: "numeric"
+    })
+  }
+
+  if (loading) {
+    return (
+      <div className="container py-12">
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container py-12">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container py-12">
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {newsArticles.map((article) => (
-          <Card key={article.id}>
-            <CardHeader>
-              <img
-                src={article.image || "/placeholder.svg"}
-                alt={article.title}
-                className="w-full h-48 object-cover rounded-t-lg"
-              />
-            </CardHeader>
-            <CardContent>
-              <CardTitle className="mb-2">{article.title}</CardTitle>
-              <p className="text-muted-foreground mb-4">{article.description}</p>
-              <p className="text-sm text-muted-foreground">{new Date(article.date).toLocaleDateString()}</p>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full">
-                Read More
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+        {posts.length > 0 ? (
+          posts.map((post) => (
+            <Card key={post._id}>
+              <CardHeader>
+                <img
+                  src={post.featuredImage ? formatImagePath(post.featuredImage) : "/placeholder.svg?height=200&width=400"}
+                  alt={post.title}
+                  className="w-full h-48 object-cover rounded-t-lg"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/placeholder.svg?height=200&width=400";
+                  }}
+                />
+              </CardHeader>
+              <CardContent>
+                <CardTitle className="mb-2">{post.title}</CardTitle>
+                <p className="text-muted-foreground mb-4">{post.excerpt}</p>
+                <p className="text-sm text-muted-foreground">
+                  {formatDate(post.createdAt)} • By {post.author.username}
+                </p>
+              </CardContent>
+              <CardFooter>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href={`/blog/${post.slug}`}>Read More</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))
+        ) : (
+          <div className="col-span-3 text-center py-12">
+            <p className="text-muted-foreground">No articles found</p>
+          </div>
+        )}
       </div>
+      
+      {pagination.pages > 1 && (
+        <div className="flex justify-center mt-8">
+          <Button variant="outline" className="w-full max-w-xs" asChild>
+            <Link href="/blog">View All Articles</Link>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
