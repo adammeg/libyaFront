@@ -21,7 +21,14 @@ interface HeroSlide {
   buttonLink?: string
 }
 
-export function HeroSection() {
+// Define the props interface
+interface HeroSectionProps {
+  title: string;
+  subtitle: string;
+  searchLabel: string;
+}
+
+export function HeroSection({ title, subtitle, searchLabel }: HeroSectionProps) {
   const [slides, setSlides] = useState<HeroSlide[]>([])
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isLoading, setIsLoading] = useState(true)

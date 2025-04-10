@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import Link from "next/link"
-import axios from "axios"
+import useTranslation from "next-translate/useTranslation"
 import { formatImagePath } from "@/utils/image-helpers"
 import { api } from "@/utils/api-helpers"
 
@@ -27,17 +27,23 @@ interface PaginationData {
   pages: number
 }
 
-export function NewsList() {
+interface NewsListProps {
+  title: string
+  viewAllLabel: string
+}
+
+export function NewsList({ title, viewAllLabel }: NewsListProps) {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [pagination, setPagination] = useState<PaginationData>({ total: 0, page: 1, pages: 1 })
+  const { lang } = useTranslation()
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true)
-        const response = await api.get('/blog/published', { limit: '3' }) // Limit to 3 posts for homepage
+        const response = await api.get('/blog/published', { limit: '3' })
         setPosts(response.data.posts)
         setPagination(response.data.pagination)
       } catch (error) {
@@ -51,9 +57,9 @@ export function NewsList() {
     fetchPosts()
   }, [])
 
-  // Format date
+  // Format date based on locale
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString(lang === 'ar' ? 'ar-LY' : 'en-US', {
       year: "numeric", 
       month: "long", 
       day: "numeric"
@@ -82,6 +88,8 @@ export function NewsList() {
 
   return (
     <div className="container py-12">
+      <h2 className="text-3xl font-bold mb-8">{title}</h2>
+      
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {posts.length > 0 ? (
           posts.map((post) => (
@@ -100,19 +108,23 @@ export function NewsList() {
                 <CardTitle className="mb-2">{post.title}</CardTitle>
                 <p className="text-muted-foreground mb-4">{post.excerpt}</p>
                 <p className="text-sm text-muted-foreground">
-                  {formatDate(post.createdAt)} • By {post.author.username}
+                  {formatDate(post.createdAt)} • {lang === 'ar' ? 'بواسطة' : 'By'} {post.author.username}
                 </p>
               </CardContent>
               <CardFooter>
                 <Button variant="outline" className="w-full" asChild>
-                  <Link href={`/blog/${post.slug}`}>Read More</Link>
+                  <Link href={`/blog/${post.slug}`}>
+                    {lang === 'ar' ? 'قراءة المزيد' : 'Read More'}
+                  </Link>
                 </Button>
               </CardFooter>
             </Card>
           ))
         ) : (
           <div className="col-span-3 text-center py-12">
-            <p className="text-muted-foreground">No articles found</p>
+            <p className="text-muted-foreground">
+              {lang === 'ar' ? 'لم يتم العثور على مقالات' : 'No articles found'}
+            </p>
           </div>
         )}
       </div>
@@ -120,7 +132,7 @@ export function NewsList() {
       {pagination.pages > 1 && (
         <div className="flex justify-center mt-8">
           <Button variant="outline" className="w-full max-w-xs" asChild>
-            <Link href="/blog">View All Articles</Link>
+            <Link href="/blog">{viewAllLabel}</Link>
           </Button>
         </div>
       )}

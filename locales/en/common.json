@@ -1,0 +1,21 @@
+{
+    "navbar": {
+      "home": "Home",
+      "vehicles": "Vehicles",
+      "blog": "Blog",
+      "contact": "Contact",
+      "account": "Account",
+      "language": "Language"
+    },
+    "footer": {
+      "quickLinks": "Quick Links",
+      "contactUs": "Contact Us",
+      "copyright": "© {{year}} Libya Auto. All rights reserved."
+    },
+    "buttons": {
+      "search": "Search",
+      "readMore": "Read More",
+      "viewAll": "View All",
+      "testDrive": "Test Drive"
+    }
+  }

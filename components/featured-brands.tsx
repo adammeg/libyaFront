@@ -5,6 +5,8 @@ import axios from "axios"
 import Link from "next/link"
 import { Loader2 } from "lucide-react"
 import { formatImagePath } from "@/utils/image-helpers"
+import { Button } from "@/components/ui/button"
+import { ChevronRight } from "lucide-react"
 
 interface Brand {
   _id: string
@@ -12,7 +14,13 @@ interface Brand {
   logo: string
 }
 
-export function FeaturedBrands() {
+// Define props interface for FeaturedBrands
+interface FeaturedBrandsProps {
+  title: string;
+  viewAllLabel: string;
+}
+
+export function FeaturedBrands({ title, viewAllLabel }: FeaturedBrandsProps) {
   const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -41,11 +49,14 @@ export function FeaturedBrands() {
   return (
     <section className="py-16">
       <div className="container">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold mb-2">Featured Brands</h2>
-          <p className="text-muted-foreground">
-            Explore vehicles from top manufacturers
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+          <Button variant="ghost" asChild>
+            <Link href="/new-cars" className="flex items-center">
+              {viewAllLabel}
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {brands.map((brand) => (
@@ -71,14 +82,6 @@ export function FeaturedBrands() {
               </div>
             </Link>
           ))}
-        </div>
-        <div className="flex justify-center mt-8">
-          <Link 
-            href="/new-cars" 
-            className="text-primary hover:underline font-medium"
-          >
-            View all brands
-          </Link>
         </div>
       </div>
     </section>

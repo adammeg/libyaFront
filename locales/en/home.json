@@ -1,1 +1,15 @@
- 
+{
+  "hero": {
+    "title": "Libya Auto",
+    "subtitle": "Your trusted source for vehicles in Libya",
+    "searchVehicles": "Search Vehicles"
+  },
+  "featuredBrands": {
+    "title": "Featured Brands",
+    "viewAll": "View All Brands"
+  },
+  "latestNews": {
+    "title": "Latest News",
+    "viewAll": "View All Articles"
+  }
+} 

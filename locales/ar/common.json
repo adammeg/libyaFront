@@ -1,0 +1,21 @@
+{
+    "navbar": {
+      "home": "الرئيسية",
+      "vehicles": "المركبات",
+      "blog": "المدونة",
+      "contact": "اتصل بنا",
+      "account": "الحساب",
+      "language": "اللغة"
+    },
+    "footer": {
+      "quickLinks": "روابط سريعة",
+      "contactUs": "اتصل بنا",
+      "copyright": "© {{year}} ليبيا أوتو. جميع الحقوق محفوظة."
+    },
+    "buttons": {
+      "search": "بحث",
+      "readMore": "قراءة المزيد",
+      "viewAll": "عرض الكل",
+      "testDrive": "تجربة قيادة"
+    }
+  }
