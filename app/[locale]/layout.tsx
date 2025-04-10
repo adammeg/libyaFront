@@ -3,7 +3,9 @@ import { Inter, IBM_Plex_Sans_Arabic } from "next/font/google"
 import "../globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/context/auth-context"
+import { ErrorBoundary } from "@/components/error-boundary"
 
+// Configure fonts outside of the component
 const inter = Inter({ 
   subsets: ["latin"],
   variable: "--font-sans",
@@ -32,11 +34,13 @@ export default function RootLayout({
   return (
     <html lang={params.locale} dir={isRtl ? "rtl" : "ltr"}>
       <body className={`${inter.variable} ${arabic.variable} ${isRtl ? "font-arabic" : "font-sans"}`}>
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+        <ErrorBoundary fallback={<div>Something went wrong!</div>}>
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )
-} 
+}

@@ -1,33 +1,42 @@
+import { getDictionary } from '@/lib/dictionaries'
 import { SiteHeader } from "@/components/site-header"
-import { HeroSection } from "@/components/hero-section"
-import { VehicleSearch } from "@/components/vehicle-search"
-import { NewsHero } from "@/components/news-hero"
-import { NewsList } from "@/components/news-list"
 import { Footer } from "@/components/footer"
-import { FeaturedBrands } from "@/components/featured-brands"
-import useTranslation from "next-translate/useTranslation"
+import ClientHomePage from "@/components/client-home-page" // We'll create this
 
-export default function Home() {
-  const { t } = useTranslation("home")
+export default async function Home({
+  params: { locale }
+}: {
+  params: { locale: string }
+}) {
+  // Server component - loads dictionary
+  let dictionary;
+  
+  try {
+    dictionary = await getDictionary(locale);
+  } catch (error) {
+    console.error("Failed to load dictionary:", error);
+    // Return a basic page if dictionary loading fails
+    return (
+      <div className="flex min-h-screen flex-col">
+        <div className="container py-12 text-center">
+          <h1 className="text-4xl font-bold">Welcome to Libya Auto</h1>
+          <p className="mt-4">We apologize, but there was an error loading the page content.</p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <main className="flex-1">
-        <HeroSection 
-          title={t("hero.title")}
-          subtitle={t("hero.subtitle")}
-          searchLabel={t("hero.searchVehicles")}
+        {/* Pass dictionary data to client component */}
+        <ClientHomePage 
+          locale={locale} 
+          dictionary={dictionary} 
         />
-        <FeaturedBrands
-          title={t("featuredBrands.title")}
-          viewAllLabel={t("featuredBrands.viewAll")}
-        />
-        <VehicleSearch />
-        <NewsHero />
-        <NewsList title={t("latestNews.title")} viewAllLabel={t("latestNews.viewAll")} />
-        <Footer/>
       </main>
+      <Footer />
     </div>
-  )
+  );
 }
