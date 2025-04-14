@@ -40,7 +40,7 @@ export function LanguageSwitcher() {
     setCurrentLocale(newLocale)
     
     // 4. Navigate
-    router.push(newPath)
+    window.location.href = newPath
   }
 
   return (

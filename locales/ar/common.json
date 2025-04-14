@@ -17,5 +17,25 @@
       "readMore": "قراءة المزيد",
       "viewAll": "عرض الكل",
       "testDrive": "تجربة قيادة"
+    },
+    "home": {
+      "title": "ليبيا أوتو",
+      "subtitle": "مصدرك الموثوق للسيارات في ليبيا",
+      "searchVehicles": "البحث عن سيارات",
+      "featuredBrands": {
+        "title": "الماركات المميزة",
+        "viewAll": "عرض كل الماركات"
+      },
+      "latestNews": {
+        "title": "أحدث الأخبار",
+        "viewAll": "عرض كل المقالات"
+      }
+    },
+    "common": {
+      "buttons": {
+        "search": "بحث",
+        "readMore": "قراءة المزيد",
+        "viewAll": "عرض الكل"
+      }
     }
   }
