@@ -1,7 +1,7 @@
 import { getDictionary } from '@/lib/dictionaries'
 import { SiteHeader } from "@/components/site-header"
 import { Footer } from "@/components/footer"
-import ClientHomePage from "@/components/client-home-page" // We'll create this
+import ClientHomePage from "@/components/client-home-page" 
 
 export default async function Home({
   params: { locale }
