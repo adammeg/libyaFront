@@ -44,10 +44,6 @@ export default function ClientHomePage({ locale, dictionary }: ClientHomePagePro
 
     return (
         <>
-            <div className="container py-12">
-                <h1 className="text-4xl font-bold">{heroTitle}</h1>
-                <p className="mt-4">{heroSubtitle}</p>
-            </div>
             <HeroSection
                 title={heroTitle}
                 subtitle={heroSubtitle}

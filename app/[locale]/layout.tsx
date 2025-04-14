@@ -4,6 +4,8 @@ import "../globals.css"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/context/auth-context"
 import { ErrorBoundary } from "@/components/error-boundary"
+import { notFound } from 'next/navigation'
+import { locales } from '@/config/i18n'
 
 // Configure fonts outside of the component
 const inter = Inter({ 
@@ -29,6 +31,10 @@ export default function RootLayout({
   children: React.ReactNode
   params: { locale: string }
 }) {
+  if (!locales.includes(params.locale)) {
+    notFound()
+  }
+  
   const isRtl = params.locale === "ar"
   
   return (
