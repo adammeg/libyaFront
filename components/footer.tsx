@@ -1,108 +1,53 @@
-import Link from "next/link"
-import { Car, Facebook, Instagram, Twitter } from "lucide-react"
+"use client"
 
-export function Footer() {
+import Link from "next/link"
+
+interface FooterProps {
+  dictionary?: any; // Add this prop definition
+}
+
+export function Footer({ dictionary = {} }: FooterProps) {
+  const currentYear = new Date().getFullYear()
+  const footerText = dictionary.footer || {}
+  
   return (
-    <footer className="bg-background border-t">
-      <div className="container py-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div>
-            <Link href="/" className="flex items-center space-x-2">
-              <Car className="h-6 w-6" />
-              <span className="font-bold">libyaauto</span>
-            </Link>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Your trusted source for quality vehicles in Libya. Find the perfect car for your needs.
-            </p>
-            <div className="mt-6 flex space-x-4">
-              <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Facebook className="h-5 w-5" />
-                <span className="sr-only">Facebook</span>
-              </Link>
-              <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </Link>
-              <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Instagram className="h-5 w-5" />
-                <span className="sr-only">Instagram</span>
-              </Link>
-            </div>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link href="/search" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Search Vehicles
-                </Link>
-              </li>
-              <li>
-                <Link href="/dealers" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Dealers
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Contact
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4">Vehicle Categories</h3>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/search?type=SEDAN" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Sedans
-                </Link>
-              </li>
-              <li>
-                <Link href="/search?type=SUV" className="text-muted-foreground hover:text-foreground transition-colors">
-                  SUVs
-                </Link>
-              </li>
-              <li>
-                <Link href="/search?type=PICKUP" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Pickup Trucks
-                </Link>
-              </li>
-              <li>
-                <Link href="/search?type=COMPACT" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Compact Cars
-                </Link>
-              </li>
-              <li>
-                <Link href="/search?type=COUPE" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Coupes
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4">Contact Us</h3>
-            <address className="not-italic text-sm text-muted-foreground space-y-2">
-              <p>123 Auto Street</p>
-              <p>Tripoli, Libya</p>
-              <p>Email: info@libyaauto.com</p>
-              <p>Phone: +218 91 123 456</p>
-            </address>
-          </div>
+    <footer className="bg-muted py-12">
+      <div className="container grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div>
+          <p className="mt-4 text-muted-foreground">
+            {footerText.copyright?.replace("{{year}}", currentYear.toString()) || 
+             `© ${currentYear} Libya Auto. All rights reserved.`}
+          </p>
         </div>
-        <div className="mt-10 pt-6 border-t text-center text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} libyaauto. All rights reserved.</p>
+        <div>
+          <h3 className="text-lg font-semibold mb-4">{footerText.quickLinks || "Quick Links"}</h3>
+          <ul className="space-y-2">
+            <li>
+              <Link href="/" className="text-muted-foreground hover:text-foreground">
+                {dictionary.navbar?.home || "Home"}
+              </Link>
+            </li>
+            <li>
+              <Link href="/vehicles" className="text-muted-foreground hover:text-foreground">
+                {dictionary.navbar?.vehicles || "Vehicles"}
+              </Link>
+            </li>
+            <li>
+              <Link href="/blog" className="text-muted-foreground hover:text-foreground">
+                {dictionary.navbar?.blog || "Blog"}
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold mb-4">{footerText.contactUs || "Contact Us"}</h3>
+          <address className="not-italic text-muted-foreground">
+            <p>Tripoli, Libya</p>
+            <p className="mt-2">Email: info@libyaauto.com</p>
+            <p className="mt-2">Phone: +218 91-234-5678</p>
+          </address>
         </div>
       </div>
     </footer>
   )
-} 
+}

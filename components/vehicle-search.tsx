@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation"
 import axios from "axios"
 
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "@/components/ui/use-toast"
 

@@ -28,11 +28,13 @@ interface PaginationData {
 }
 
 interface NewsListProps {
-  title: string
-  viewAllLabel: string
+  title: string;
+  viewAllLabel: string;
+  locale?: string;
+  dictionary?: any;
 }
 
-export function NewsList({ title, viewAllLabel }: NewsListProps) {
+export function NewsList({ title, viewAllLabel, locale = "en", dictionary }: NewsListProps) {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -88,7 +90,7 @@ export function NewsList({ title, viewAllLabel }: NewsListProps) {
 
   return (
     <div className="container py-12">
-      <h2 className="text-3xl font-bold mb-8">{title}</h2>
+      <h2 className="text-3xl font-bold mb-8">{dictionary.newsList?.title || title}</h2>
       
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {posts.length > 0 ? (

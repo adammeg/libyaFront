@@ -23,26 +23,35 @@ export default function ClientHomePage({ locale, dictionary }: ClientHomePagePro
         console.log("Dictionary:", dictionary);
     }, [locale, dictionary]);
     
-    return (
-        <>
-            <HeroSection
-                title={translations.title || 'Welcome to Libya Auto'}
-                subtitle={translations.subtitle || 'Your trusted source for vehicles in Libya'}
-                searchLabel={translations.searchVehicles || 'Search Vehicles'}
-            />
-            
-            <FeaturedBrands
-                title={translations.featuredBrands?.title || 'Featured Brands'}
-                viewAllLabel={translations.featuredBrands?.viewAll || 'View All'}
-            />
-            
-            <VehicleSearch />
-            <NewsHero />
-            
-            <NewsList 
-                title={translations.latestNews?.title || 'Latest News'} 
-                viewAllLabel={translations.latestNews?.viewAll || 'View All Articles'} 
-            />
-        </>
-    );
+// In your ClientHomePage component, add:
+
+return (
+    <>
+      <HeroSection
+        title={translations.title || 'Welcome to Libya Auto'}
+        subtitle={translations.subtitle || 'Your trusted source for vehicles in Libya'}
+        searchLabel={translations.searchVehicles || 'Search Vehicles'}
+      />
+      
+      <FeaturedBrands
+        title={translations.featuredBrands?.title || 'Featured Brands'}
+        viewAllLabel={translations.featuredBrands?.viewAll || 'View All'}
+      />
+      
+      <VehicleSearch 
+      />
+      
+      <NewsHero 
+        locale={locale}
+        dictionary={dictionary}
+      />
+      
+      <NewsList 
+        title={translations.latestNews?.title || 'Latest News'} 
+        viewAllLabel={translations.latestNews?.viewAll || 'View All Articles'} 
+        locale={locale}
+        dictionary={dictionary}
+      />
+    </>
+  );
 } 

@@ -8,14 +8,14 @@ export default async function Home({
 }: {
   params: { locale: string }
 }) {
-  console.log("Loading page for locale:", locale); // Debug log
+  console.log("Loading page for locale:", locale);
   
   // Server component - loads dictionary
   let dictionary;
   
   try {
     dictionary = await getDictionary(locale);
-    console.log("Dictionary loaded:", Object.keys(dictionary)); // Debug log
+    console.log("Dictionary loaded:", Object.keys(dictionary));
   } catch (error) {
     console.error("Failed to load dictionary:", error);
     // Return a basic page if dictionary loading fails
@@ -31,14 +31,14 @@ export default async function Home({
   
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
+      <SiteHeader dictionary={dictionary} />
       <main className="flex-1">
         <ClientHomePage 
           locale={locale} 
           dictionary={dictionary} 
         />
       </main>
-      <Footer />
+      <Footer dictionary={dictionary} />
     </div>
   );
 }

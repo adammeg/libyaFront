@@ -3,37 +3,44 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import useTranslation from "next-translate/useTranslation"
-import { Menu, X, Search, User, Car, ShoppingBag } from "lucide-react"
+import { Menu, X, Search, Car, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { cn } from "@/lib/utils"
 
-export function Navbar() {
+interface NavbarProps {
+  locale: string;
+  dictionary?: any;
+}
+
+export function Navbar({ locale, dictionary = {} }: NavbarProps) {
   const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { t, lang } = useTranslation("common")
-
+  
+  // Get translations (safely)
+  const t = dictionary.navbar || {}
+  const buttons = dictionary.buttons || {}
+  
   const routes = [
     {
-      href: "/",
-      label: t("navbar.home"),
-      active: pathname === "/",
+      href: `/${locale}`,
+      label: t.home || "Home",
+      active: pathname === `/${locale}`,
     },
     {
-      href: "/vehicles",
-      label: t("navbar.vehicles"),
-      active: pathname === "/vehicles" || pathname?.startsWith("/vehicles"),
+      href: `/${locale}/vehicles`,
+      label: t.vehicles || "Vehicles",
+      active: pathname === `/${locale}/vehicles` || pathname?.startsWith(`/${locale}/vehicles`),
     },
     {
-      href: "/blog",
-      label: t("navbar.blog"),
-      active: pathname?.startsWith("/blog"),
+      href: `/${locale}/blog`,
+      label: t.blog || "Blog",
+      active: pathname?.startsWith(`/${locale}/blog`),
     },
     {
-      href: "/contact",
-      label: t("navbar.contact"),
-      active: pathname === "/contact",
+      href: `/${locale}/contact`,
+      label: t.contact || "Contact",
+      active: pathname === `/${locale}/contact`,
     },
   ]
 
@@ -41,9 +48,9 @@ export function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container flex h-16 items-center">
         <div className="flex gap-6 md:gap-10">
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href={`/${locale}`} className="flex items-center space-x-2">
             <Car className="h-6 w-6" />
-            <span className="font-bold">{lang === "ar" ? "ليبيا أوتو" : "Libya Auto"}</span>
+            <span className="font-bold">{locale === "ar" ? "ليبيا أوتو" : "Libya Auto"}</span>
           </Link>
           <nav className="hidden md:flex gap-6">
             {routes.map((route) => (
@@ -67,11 +74,11 @@ export function Navbar() {
           </div>
           <Button variant="ghost" size="icon">
             <Search className="h-5 w-5" />
-            <span className="sr-only">{t("buttons.search")}</span>
+            <span className="sr-only">{buttons.search || "Search"}</span>
           </Button>
           <Button className="hidden md:flex">
             <ShoppingBag className="mr-2 h-5 w-5" />
-            {t("buttons.testDrive")}
+            {buttons.testDrive || "Test Drive"}
           </Button>
           <Button
             variant="ghost"
@@ -121,4 +128,4 @@ export function Navbar() {
       )}
     </header>
   )
-} 
+}

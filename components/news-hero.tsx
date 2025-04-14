@@ -16,7 +16,12 @@ interface BlogPost {
   createdAt: string
 }
 
-export function NewsHero() {
+interface NewsHeroProps {
+  locale?: string;
+  dictionary?: any;
+}
+
+export function NewsHero({ locale = "en", dictionary }: NewsHeroProps) {
   const [featuredPost, setFeaturedPost] = useState<BlogPost | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -67,14 +72,14 @@ export function NewsHero() {
       <div className="container">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-bold mb-4">Latest News</h2>
+            <h2 className="text-3xl font-bold mb-4">{dictionary.newsHero?.title || "Latest News"}</h2>
             <h3 className="text-2xl font-semibold mb-4">{featuredPost.title}</h3>
             <p className="text-muted-foreground mb-6">{featuredPost.excerpt}</p>
             <p className="text-sm text-muted-foreground mb-6">
               {formatDate(featuredPost.createdAt)}
             </p>
             <Button asChild>
-              <Link href={`/blog/${featuredPost.slug}`}>Read Full Article</Link>
+              <Link href={`/blog/${featuredPost.slug}`}>{dictionary.newsHero?.readFullArticle || "Read Full Article"}</Link>
             </Button>
           </div>
           <div className="rounded-lg overflow-hidden shadow-lg">

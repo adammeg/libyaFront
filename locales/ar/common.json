@@ -31,6 +31,15 @@
         "viewAll": "عرض كل المقالات"
       }
     },
+    "vehicles": {
+      "newVehicles": "سيارات جديدة",
+      "usedVehicles": "سيارات مستعملة",
+      "sedan": "سيدان",
+      "suv": "دفع رباعي",
+      "pickup": "بيك أب",
+      "berlin": "برلين",
+      "allBrands": "عرض كل الماركات"
+    },
     "common": {
       "buttons": {
         "search": "بحث",

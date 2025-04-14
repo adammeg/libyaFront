@@ -17,5 +17,34 @@
       "readMore": "Read More",
       "viewAll": "View All",
       "testDrive": "Test Drive"
+    },
+    "home": {
+      "title": "Libya Auto",
+      "subtitle": "Your trusted source for vehicles in Libya",
+      "searchVehicles": "Search Vehicles",
+      "featuredBrands": {
+        "title": "Featured Brands",
+        "viewAll": "View All Brands"
+      },
+      "latestNews": {
+        "title": "Latest News",
+        "viewAll": "View All Articles"
+      }
+    },
+    "vehicles": {
+      "newVehicles": "NEW VEHICLES",
+      "usedVehicles": "USED VEHICLES",
+      "sedan": "SEDAN",
+      "suv": "SUV",
+      "pickup": "PICKUP",
+      "berlin": "BERLIN",
+      "allBrands": "View All Brands"
+    },
+    "common": {
+      "buttons": {
+        "search": "Search",
+        "readMore": "Read More",
+        "viewAll": "View All"
+      }
     }
   }
