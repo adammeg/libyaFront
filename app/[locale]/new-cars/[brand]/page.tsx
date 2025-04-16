@@ -228,7 +228,7 @@ export default function BrandDetailPage() {
           ) : null}
         </div>
       </main>
-      <Footer />
+      <Footer locale={params?.locale as string} />
     </div>
   )
 }
