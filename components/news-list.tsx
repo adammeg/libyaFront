@@ -34,7 +34,7 @@ interface NewsListProps {
   dictionary?: any;
 }
 
-export function NewsList({ title, viewAllLabel, locale = "en", dictionary }: NewsListProps) {
+export function NewsList({ title, viewAllLabel, locale = "en", dictionary = {} }: NewsListProps) {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +45,10 @@ export function NewsList({ title, viewAllLabel, locale = "en", dictionary }: New
     const fetchPosts = async () => {
       try {
         setLoading(true)
-        const response = await api.get('/blog/published', { limit: '3' })
+        const response = await api.get('/blog/published', { 
+          limit: '3',
+          lang: locale
+        })
         setPosts(response.data.posts)
         setPagination(response.data.pagination)
       } catch (error) {
@@ -57,7 +60,7 @@ export function NewsList({ title, viewAllLabel, locale = "en", dictionary }: New
     }
 
     fetchPosts()
-  }, [])
+  }, [locale])
 
   // Format date based on locale
   const formatDate = (dateString: string) => {
