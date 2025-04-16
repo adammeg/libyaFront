@@ -38,7 +38,20 @@
       "suv": "SUV",
       "pickup": "PICKUP",
       "berlin": "BERLIN",
-      "allBrands": "View All Brands"
+      "allBrands": "View All Brands",
+      "title": "Vehicles",
+      "description": "Browse our wide selection of vehicles from top brands."
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Latest news and updates from Libya Auto."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "description": "Get in touch with our team. We're here to help.",
+      "infoTitle": "Contact Information",
+      "formTitle": "Send us a message",
+      "formPlaceholder": "Contact form will be implemented here."
     },
     "common": {
       "buttons": {

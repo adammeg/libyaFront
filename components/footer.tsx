@@ -4,9 +4,10 @@ import Link from "next/link"
 
 interface FooterProps {
   dictionary?: any; // Add this prop definition
+  locale: string;
 }
 
-export function Footer({ dictionary = {} }: FooterProps) {
+export function Footer({ dictionary = {}, locale }: FooterProps) {
   const currentYear = new Date().getFullYear()
   const footerText = dictionary.footer || {}
   
@@ -23,17 +24,17 @@ export function Footer({ dictionary = {} }: FooterProps) {
           <h3 className="text-lg font-semibold mb-4">{footerText.quickLinks || "Quick Links"}</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="/" className="text-muted-foreground hover:text-foreground">
+              <Link href={`/${locale}/`} className="text-muted-foreground hover:text-foreground">
                 {dictionary.navbar?.home || "Home"}
               </Link>
             </li>
             <li>
-              <Link href="/vehicles" className="text-muted-foreground hover:text-foreground">
+              <Link href={`/${locale}/vehicles`} className="text-muted-foreground hover:text-foreground">
                 {dictionary.navbar?.vehicles || "Vehicles"}
               </Link>
             </li>
             <li>
-              <Link href="/blog" className="text-muted-foreground hover:text-foreground">
+              <Link href={`/${locale}/blog`} className="text-muted-foreground hover:text-foreground">
                 {dictionary.navbar?.blog || "Blog"}
               </Link>
             </li>

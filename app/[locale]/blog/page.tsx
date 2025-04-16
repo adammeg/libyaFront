@@ -12,6 +12,8 @@ import Link from "next/link"
 import { formatImagePath } from "@/utils/image-helpers"
 import { api } from "@/utils/api-helpers"
 import React from "react"
+import { getDictionary } from '@/lib/dictionaries'
+
 interface BlogPost {
   _id: string
   title: string
@@ -32,7 +34,14 @@ interface PaginationData {
   pages: number
 }
 
-export default function BlogIndexPage() {
+export default async function BlogPage({
+  params: { locale }
+}: {
+  params: { locale: string }
+}) {
+  // Server component - loads dictionary
+  const dictionary = await getDictionary(locale);
+  
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -92,15 +101,15 @@ export default function BlogIndexPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
+      <SiteHeader dictionary={dictionary} />
       <main className="flex-1">
         <div className="container py-12">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Blog Articles</h1>
-            <p className="text-muted-foreground">
-              Latest news and updates from Libya Auto
-            </p>
-          </div>
+          <h1 className="text-4xl font-bold mb-6">
+            {dictionary.blog?.title || 'Blog'}
+          </h1>
+          <p className="text-lg mb-8">
+            {dictionary.blog?.description || 'Latest news and updates from Libya Auto.'}
+          </p>
           
           <div className="flex flex-col gap-4 mb-8">
             <div className="relative">
@@ -315,7 +324,7 @@ export default function BlogIndexPage() {
           )}
         </div>
       </main>
-      <Footer />
+      <Footer dictionary={dictionary} locale={locale} />
     </div>
   )
 } 
