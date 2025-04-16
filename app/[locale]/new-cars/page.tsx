@@ -18,7 +18,11 @@ interface Brand {
   logo: string
 }
 
-export default function NewCarsPage() {
+  export default function NewCarsPage({
+    params: { locale }
+  }: {
+    params: { locale: string }
+  }) {
   const router = useRouter()
   const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
@@ -133,7 +137,7 @@ export default function NewCarsPage() {
           )}
         </div>
       </main>
-      <Footer />
+      <Footer locale={locale} />  
     </div>
   )
 }
