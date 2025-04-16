@@ -163,7 +163,7 @@ export default function BlogPostPage() {
           )}
         </div>
       </main>
-      <Footer />
+      <Footer locale={params?.locale as string} />
     </div>
   )
 } 
