@@ -1,6 +1,9 @@
 import { getDictionary, Dictionary } from '@/lib/dictionaries'
 import { SiteHeader } from "@/components/site-header"
 import { Footer } from "@/components/footer"
+import { VehicleCard } from "@/components/vehicle-card"
+import { api } from "@/utils/api-helpers"
+import { useState, useEffect } from "react"
 
 export default async function VehiclesPage({
   params: { locale }
@@ -31,6 +34,21 @@ export default async function VehiclesPage({
       );
     }
     
+    const [vehicles, setVehicles] = useState([]);
+
+    useEffect(() => {
+      async function fetchVehicles() {
+        try {
+          const response = await api.get('/cars', { lang: locale });
+          setVehicles(response.data);
+        } catch (error) {
+          console.error("Error fetching vehicles:", error);
+        }
+      }
+      
+      fetchVehicles();
+    }, [locale]);
+
     return (
       <div className="flex min-h-screen flex-col">
         <SiteHeader dictionary={dictionary} />
@@ -43,9 +61,14 @@ export default async function VehiclesPage({
               {dictionary.vehicles?.description || 'Browse our wide selection of vehicles from top brands.'}
             </p>
             
-            {/* Vehicle listing will go here */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {/* Vehicle cards will go here */}
+              {vehicles.map((vehicle: any) => (
+                <VehicleCard 
+                  key={vehicle._id} 
+                  vehicle={vehicle} 
+                  locale={locale} 
+                />
+              ))}
             </div>
           </div>
         </main>
