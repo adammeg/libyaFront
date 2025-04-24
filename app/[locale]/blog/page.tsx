@@ -14,7 +14,7 @@ export default async function BlogPage({
   
   // Log for debugging
   console.log("BlogPage server render, locale:", locale);
-  
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader dictionary={dictionary} />

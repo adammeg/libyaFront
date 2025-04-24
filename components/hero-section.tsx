@@ -160,7 +160,7 @@ export function HeroSection({ title, subtitle, searchLabel }: HeroSectionProps) 
               <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-black"></div>
             )}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/30"></div>
-          </div>
+              </div>
           
           {/* Content container */}
           <div className="container relative z-10 flex flex-col items-center justify-center h-full py-20">
