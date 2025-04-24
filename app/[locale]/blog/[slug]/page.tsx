@@ -1,19 +1,13 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
 import { SiteHeader } from "@/components/site-header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { Calendar, User, Tag, Loader2, ArrowLeft } from "lucide-react"
+import { Calendar, User, Tag, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { formatImagePath } from "@/utils/image-helpers"
-import { api } from "@/utils/api-helpers"
 import { Metadata } from 'next'
 import axios from 'axios'
-import parse from 'html-react-parser'
 import { notFound } from 'next/navigation'
 
 interface BlogPost {
