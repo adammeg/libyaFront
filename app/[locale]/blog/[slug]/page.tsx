@@ -33,7 +33,7 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
     const dictionary = await getDictionary(params.locale);
     
     // Log the API URL for debugging
-    console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`);
+    console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL}/blog/post/${params.slug}`);
     
     // Try with a more reliable API path structure - test different possibilities
     let post;
@@ -41,20 +41,20 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
     
     try {
       // First attempt with the current path
-      response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`);
+      response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/post/${params.slug}`);
       post = response.data;
     } catch (err) {
       console.log("First API attempt failed, trying alternative endpoint");
       
       try {
         // Try an alternative path structure
-        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${params.slug}`);
+        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${params.slug}`);
         post = response.data;
       } catch (err2) {
         console.log("Second API attempt failed, trying another alternative");
         
         // Try one more alternative
-        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/${params.slug}`);
+        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/${params.slug}`);
         post = response.data;
       }
     }
@@ -174,7 +174,7 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
             <div className="text-center py-12">
               <p className="text-red-500 mb-4">Failed to load article. Please check your API endpoint configuration.</p>
               <div className="text-sm text-gray-600 mb-4">
-                Attempted to load from: {process.env.NEXT_PUBLIC_API_URL}/api/blog/post/{params.slug}
+                Attempted to load from: {process.env.NEXT_PUBLIC_API_URL}/blog/post/{params.slug}
               </div>
               <Button variant="outline" asChild>
                 <Link href="/blog">
@@ -197,14 +197,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     let post;
     
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/post/${params.slug}`);
       post = response.data;
     } catch (err) {
       try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${params.slug}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${params.slug}`);
         post = response.data;
       } catch (err2) {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/${params.slug}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/${params.slug}`);
         post = response.data;
       }
     }
