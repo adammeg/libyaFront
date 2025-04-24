@@ -32,37 +32,24 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
     // First get the dictionary for localization
     const dictionary = await getDictionary(params.locale);
     
-    // Log the API URL for debugging
-    console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL}/blog/post/${params.slug}`);
+    // We need to fix the API endpoint - using a direct API path with no prefix
+    // The API might expect the locale as well
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${params.slug}?locale=${params.locale}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      cache: 'no-store'
+    });
     
-    // Try with a more reliable API path structure - test different possibilities
-    let post;
-    let response;
-    
-    try {
-      // First attempt with the current path
-      response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/post/${params.slug}`);
-      post = response.data;
-    } catch (err) {
-      console.log("First API attempt failed, trying alternative endpoint");
-      
-      try {
-        // Try an alternative path structure
-        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${params.slug}`);
-        post = response.data;
-      } catch (err2) {
-        console.log("Second API attempt failed, trying another alternative");
-        
-        // Try one more alternative
-        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/${params.slug}`);
-        post = response.data;
-      }
+    if (!response.ok) {
+      throw new Error(`API returned status: ${response.status}`);
     }
     
-    console.log("Post data:", post);
+    const post = await response.json();
     
     if (!post) {
-      console.log("No post data returned from API");
       return notFound();
     }
     
@@ -157,11 +144,6 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
     );
   } catch (error) {
     console.error("Error fetching blog post:", error);
-    // Detailed error logging for debugging
-    if (axios.isAxiosError(error)) {
-      console.error("Response status:", error.response?.status);
-      console.error("Response data:", error.response?.data);
-    }
     
     // Get dictionary even in error state
     const dictionary = await getDictionary(params.locale).catch(() => ({}));
@@ -173,9 +155,6 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
           <div className="container py-12">
             <div className="text-center py-12">
               <p className="text-red-500 mb-4">Failed to load article. Please check your API endpoint configuration.</p>
-              <div className="text-sm text-gray-600 mb-4">
-                Attempted to load from: {process.env.NEXT_PUBLIC_API_URL}/blog/post/{params.slug}
-              </div>
               <Button variant="outline" asChild>
                 <Link href="/blog">
                   <ArrowLeft className="mr-2 h-4 w-4" />
@@ -191,30 +170,17 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { slug: string, locale: string } }): Promise<Metadata> {
   try {
-    // Try multiple API paths to ensure one works
-    let post;
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${params.slug}?locale=${params.locale}`, {
+      cache: 'no-store'
+    });
     
-    try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/post/${params.slug}`);
-      post = response.data;
-    } catch (err) {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blogs/${params.slug}`);
-        post = response.data;
-      } catch (err2) {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/${params.slug}`);
-        post = response.data;
-      }
+    if (!response.ok) {
+      throw new Error(`API returned status ${response.status}`);
     }
     
-    if (!post) {
-      return {
-        title: 'Blog Post',
-        description: 'Read our latest blog post',
-      };
-    }
+    const post = await response.json();
     
     return {
       title: post.title,
