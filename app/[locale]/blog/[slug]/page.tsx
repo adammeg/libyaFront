@@ -11,6 +11,10 @@ import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import { formatImagePath } from "@/utils/image-helpers"
 import { api } from "@/utils/api-helpers"
+import { Metadata } from 'next'
+import axios from 'axios'
+import parse from 'html-react-parser'
+import { notFound } from 'next/navigation'
 
 interface BlogPost {
   _id: string
@@ -28,60 +32,30 @@ interface BlogPost {
   updatedAt: string
 }
 
-export default function BlogPostPage() {
-  const params = useParams()
-  const [post, setPost] = useState<BlogPost | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        setLoading(true)
-        const response = await api.get(`/blog/post/${params?.slug}`)
-        setPost(response.data)
-      } catch (error) {
-        console.error("Error fetching blog post:", error)
-        setError("Failed to load article")
-      } finally {
-        setLoading(false)
-      }
+export default async function BlogPost({ params }: { params: { slug: string, locale: string } }) {
+  try {
+    // Fetch the blog post data using the slug
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${params.slug}`)
+    const post = response.data
+    
+    if (!post) {
+      return notFound()
     }
-
-    if (params?.slug) {
-      fetchPost()
+    
+    // Format date
+    const formatDate = (dateString: string) => {
+      return new Date(dateString).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      })
     }
-  }, [params?.slug])
-
-  // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    })
-  }
-
-  return (
-    <div className="flex min-h-screen flex-col">
-      <SiteHeader />
-      <main className="flex-1">
-        <div className="container py-12">
-          {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : error ? (
-            <div className="text-center py-12">
-              <p className="text-red-500 mb-4">{error}</p>
-              <Button variant="outline" asChild>
-                <Link href="/blog">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Blog
-                </Link>
-              </Button>
-            </div>
-          ) : post ? (
+    
+    return (
+      <div className="flex min-h-screen flex-col">
+        <SiteHeader />
+        <main className="flex-1">
+          <div className="container py-12">
             <article className="max-w-4xl mx-auto">
               <Link href="/blog" className="text-muted-foreground hover:text-primary mb-4 inline-flex items-center">
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -126,7 +100,7 @@ export default function BlogPostPage() {
                   <div>
                     <h3 className="text-sm font-medium mb-2">Categories</h3>
                     <div className="flex flex-wrap gap-2">
-                      {post.categories.map((category, index) => (
+                      {post.categories.map((category: string, index: number) => (
                         <Badge key={`cat-${index}`} variant="secondary">
                           {category}
                         </Badge>
@@ -139,7 +113,7 @@ export default function BlogPostPage() {
                   <div className="sm:ml-auto">
                     <h3 className="text-sm font-medium mb-2">Tags</h3>
                     <div className="flex flex-wrap gap-2">
-                      {post.tags.map((tag, index) => (
+                      {post.tags.map((tag: string, index: number) => (
                         <Badge key={`tag-${index}`} variant="outline">
                           <Tag className="mr-1 h-3 w-3" />
                           {tag}
@@ -150,9 +124,20 @@ export default function BlogPostPage() {
                 )}
               </div>
             </article>
-          ) : (
+          </div>
+        </main>
+        <Footer locale={params.locale} />
+      </div>
+    )
+  } catch (error) {
+    console.error("Error fetching blog post:", error)
+    return (
+      <div className="flex min-h-screen flex-col">
+        <SiteHeader />
+        <main className="flex-1">
+          <div className="container py-12">
             <div className="text-center py-12">
-              <p className="text-muted-foreground mb-4">Article not found</p>
+              <p className="text-red-500 mb-4">Failed to load article</p>
               <Button variant="outline" asChild>
                 <Link href="/blog">
                   <ArrowLeft className="mr-2 h-4 w-4" />
@@ -160,10 +145,27 @@ export default function BlogPostPage() {
                 </Link>
               </Button>
             </div>
-          )}
-        </div>
-      </main>
-      <Footer locale={params?.locale as string} />
-    </div>
-  )
+          </div>
+        </main>
+        <Footer locale={params.locale} />
+      </div>
+    )
+  }
+}
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  try {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${params.slug}`)
+    const post = response.data
+    
+    return {
+      title: post.title,
+      description: post.excerpt || post.title,
+    }
+  } catch (error) {
+    return {
+      title: 'Blog Post',
+      description: 'Read our latest blog post',
+    }
+  }
 } 
