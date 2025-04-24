@@ -1,3 +1,5 @@
+"use client"
+
 import { SiteHeader } from "@/components/site-header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
