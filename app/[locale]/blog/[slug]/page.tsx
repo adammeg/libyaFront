@@ -9,6 +9,7 @@ import { formatImagePath } from "@/utils/image-helpers"
 import { Metadata } from 'next'
 import axios from 'axios'
 import { notFound } from 'next/navigation'
+import { getDictionary } from "@/lib/dictionaries"
 
 interface BlogPost {
   _id: string
@@ -28,8 +29,11 @@ interface BlogPost {
 
 export default async function BlogPost({ params }: { params: { slug: string, locale: string } }) {
   try {
-    // Fetch the blog post data using the slug
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${params.slug}`)
+    // First get the dictionary for localization
+    const dictionary = await getDictionary(params.locale);
+    
+    // Fixed API endpoint to match your backend structure
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`)
     const post = response.data
     
     if (!post) {
@@ -47,7 +51,7 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
     
     return (
       <div className="flex min-h-screen flex-col">
-        <SiteHeader />
+        <SiteHeader dictionary={dictionary} />
         <main className="flex-1">
           <div className="container py-12">
             <article className="max-w-4xl mx-auto">
@@ -120,14 +124,17 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
             </article>
           </div>
         </main>
-        <Footer locale={params.locale} />
+        <Footer locale={params.locale} dictionary={dictionary} />
       </div>
     )
   } catch (error) {
     console.error("Error fetching blog post:", error)
+    // Get dictionary even in error state
+    const dictionary = await getDictionary(params.locale).catch(() => ({}));
+    
     return (
       <div className="flex min-h-screen flex-col">
-        <SiteHeader />
+        <SiteHeader dictionary={dictionary} />
         <main className="flex-1">
           <div className="container py-12">
             <div className="text-center py-12">
@@ -141,7 +148,7 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
             </div>
           </div>
         </main>
-        <Footer locale={params.locale} />
+        <Footer locale={params.locale} dictionary={dictionary} />
       </div>
     )
   }
@@ -149,7 +156,7 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${params.slug}`)
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`)
     const post = response.data
     
     return {
