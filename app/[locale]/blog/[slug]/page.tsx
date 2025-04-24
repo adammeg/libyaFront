@@ -32,12 +32,38 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
     // First get the dictionary for localization
     const dictionary = await getDictionary(params.locale);
     
-    // Fixed API endpoint to match your backend structure
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`)
-    const post = response.data
+    // Log the API URL for debugging
+    console.log(`API URL: ${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`);
+    
+    // Try with a more reliable API path structure - test different possibilities
+    let post;
+    let response;
+    
+    try {
+      // First attempt with the current path
+      response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`);
+      post = response.data;
+    } catch (err) {
+      console.log("First API attempt failed, trying alternative endpoint");
+      
+      try {
+        // Try an alternative path structure
+        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${params.slug}`);
+        post = response.data;
+      } catch (err2) {
+        console.log("Second API attempt failed, trying another alternative");
+        
+        // Try one more alternative
+        response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/${params.slug}`);
+        post = response.data;
+      }
+    }
+    
+    console.log("Post data:", post);
     
     if (!post) {
-      return notFound()
+      console.log("No post data returned from API");
+      return notFound();
     }
     
     // Format date
@@ -46,8 +72,8 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
         year: "numeric",
         month: "long",
         day: "numeric"
-      })
-    }
+      });
+    };
     
     return (
       <div className="flex min-h-screen flex-col">
@@ -67,10 +93,12 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
                   <Calendar className="mr-1 h-4 w-4" />
                   {formatDate(post.createdAt)}
                 </div>
-                <div className="flex items-center">
-                  <User className="mr-1 h-4 w-4" />
-                  {post.author.username}
-                </div>
+                {post.author && post.author.username && (
+                  <div className="flex items-center">
+                    <User className="mr-1 h-4 w-4" />
+                    {post.author.username}
+                  </div>
+                )}
               </div>
               
               {post.featuredImage && (
@@ -94,7 +122,7 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
               <Separator className="my-8" />
               
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                {post.categories.length > 0 && (
+                {post.categories && post.categories.length > 0 && (
                   <div>
                     <h3 className="text-sm font-medium mb-2">Categories</h3>
                     <div className="flex flex-wrap gap-2">
@@ -107,7 +135,7 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
                   </div>
                 )}
                 
-                {post.tags.length > 0 && (
+                {post.tags && post.tags.length > 0 && (
                   <div className="sm:ml-auto">
                     <h3 className="text-sm font-medium mb-2">Tags</h3>
                     <div className="flex flex-wrap gap-2">
@@ -126,9 +154,15 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
         </main>
         <Footer locale={params.locale} dictionary={dictionary} />
       </div>
-    )
+    );
   } catch (error) {
-    console.error("Error fetching blog post:", error)
+    console.error("Error fetching blog post:", error);
+    // Detailed error logging for debugging
+    if (axios.isAxiosError(error)) {
+      console.error("Response status:", error.response?.status);
+      console.error("Response data:", error.response?.data);
+    }
+    
     // Get dictionary even in error state
     const dictionary = await getDictionary(params.locale).catch(() => ({}));
     
@@ -138,7 +172,10 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
         <main className="flex-1">
           <div className="container py-12">
             <div className="text-center py-12">
-              <p className="text-red-500 mb-4">Failed to load article</p>
+              <p className="text-red-500 mb-4">Failed to load article. Please check your API endpoint configuration.</p>
+              <div className="text-sm text-gray-600 mb-4">
+                Attempted to load from: {process.env.NEXT_PUBLIC_API_URL}/api/blog/post/{params.slug}
+              </div>
               <Button variant="outline" asChild>
                 <Link href="/blog">
                   <ArrowLeft className="mr-2 h-4 w-4" />
@@ -150,23 +187,43 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
         </main>
         <Footer locale={params.locale} dictionary={dictionary} />
       </div>
-    )
+    );
   }
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`)
-    const post = response.data
+    // Try multiple API paths to ensure one works
+    let post;
+    
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/post/${params.slug}`);
+      post = response.data;
+    } catch (err) {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blogs/${params.slug}`);
+        post = response.data;
+      } catch (err2) {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/blog/${params.slug}`);
+        post = response.data;
+      }
+    }
+    
+    if (!post) {
+      return {
+        title: 'Blog Post',
+        description: 'Read our latest blog post',
+      };
+    }
     
     return {
       title: post.title,
       description: post.excerpt || post.title,
-    }
+    };
   } catch (error) {
     return {
       title: 'Blog Post',
       description: 'Read our latest blog post',
-    }
+    };
   }
 } 
