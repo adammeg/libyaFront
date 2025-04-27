@@ -34,21 +34,12 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
     
     // We need to fix the API endpoint - using a direct API path with no prefix
     // The API might expect the locale as well
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/${params.slug}?locale=${params.locale}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      cache: 'no-store'
-    });
-    
-    if (!response.ok) {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/${params.slug}?locale=${params.locale}`);
+    if (!response.data) {
       throw new Error(`API returned status: ${response.status}`);
     }
     
-    const post = await response.json();
-    
+    const post = response.data;
     if (!post) {
       return notFound();
     }
@@ -107,7 +98,6 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
               />
               
               <Separator className="my-8" />
-              
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 {post.categories && post.categories.length > 0 && (
                   <div>
