@@ -10,6 +10,7 @@ import { Metadata } from 'next'
 import axios from 'axios'
 import { notFound } from 'next/navigation'
 import { getDictionary } from "@/lib/dictionaries"
+import { api } from "@/utils/api-helpers"
 
 interface BlogPost {
   _id: string
@@ -34,7 +35,7 @@ export default async function BlogPost({ params }: { params: { slug: string, loc
     
     // We need to fix the API endpoint - using a direct API path with no prefix
     // The API might expect the locale as well
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/blog/post/${params.slug}`);
+    const response = await api.get(`/blog/post/${params.slug}`);
     console.log(response);
     
     if (!response.data) {
